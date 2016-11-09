@@ -4,7 +4,7 @@
   <script type="text/javascript" src="blogs.json"></script>
   
   <script>
-  function loadBlog(file) {
+  function loadBlog(file, id) {
     $.ajax({
       url : "blogs/" + file,
       dataType: "html",
@@ -48,13 +48,16 @@
   const NEW = '<font color="RED">newest</font>';
   var blogList = '<ul>';
   for (var i = 0; i < blogs.length; i++) {
-    blogList += '<li><a onclick="loadBlog(blogs[' + i + '].file)" id="blog' + i + '">' + blogs[i].name + '</a> ' + (i == 0 ? NEW : '') + '</li>';
+    blogList += '<li><a onclick="loadBlog(blogs[' + i + '].file, ' + i + ')" id="blog' + i + '">' + blogs[i].name + '</a> ' + (i == 0 ? NEW : '') + '</li>';
   }
   blogList += '</ul>';
   $('div.blogs').html( blogList );
   
-  /* for (var i = 0; i < blogs.length; i++) { 
-    document.getElementById("blog" + i).onclick = loadBlog(blogs[i].file);
-  } */
+  var gotoBlog = Number(location.search.substr(1));
+  if (Number.isNumeric(gotoBlog)) {
+    if (blogs[gotoBlog] !== undefined) {
+      loadBlog(blogs[gotoBlog].file, blogs[gotoBlog].id);
+    }
+  }
   </script>
 </html>
