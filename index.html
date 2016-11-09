@@ -3,6 +3,18 @@
   <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   <script type="text/javascript" src="blogs.json"></script>
   
+  <script>
+  function loadBlog(file) {
+    $.ajax({
+      url : "blogs/" + file,
+      dataType: "html",
+      success : function (data) {
+        $(".main-content").html(data);
+      }
+    });
+  }
+  </script>
+  
   <head>
     <meta charset="UTF-8">
     <title>Works Of Barry by WorksOfBarry</title>
@@ -30,27 +42,16 @@
   
   </body>
   <script>
-  function loadBlog(file) {
-    $.ajax({
-      url : "blogs/" + file,
-      dataType: "html",
-      success : function (data) {
-        console.log(data);
-        $("main-content").html(data);
-      }
-    });
-  }
-  
   const NEW = '<font color="RED">newest</font>';
   var blogList = '<ul>';
   for (var i = 0; i < blogs.length; i++) {
-    blogList += '<li><a id="blog' + i + '">' + blogs[i].name + ' ' + (i == 0 ? NEW : '') + '</a></li>';
+    blogList += '<li><a onclick="loadBlog(blogs[' + i + '].file)" id="blog' + i + '">' + blogs[i].name + ' ' + (i == 0 ? NEW : '') + '</a></li>';
   }
   blogList += '</ul>';
   $('div.blogs').html( blogList );
   
-  for (var i = 0; i < blogs.length; i++) { 
+  /* for (var i = 0; i < blogs.length; i++) { 
     document.getElementById("blog" + i).onclick = loadBlog(blogs[i].file);
-  }
+  } */
   </script>
 </html>
