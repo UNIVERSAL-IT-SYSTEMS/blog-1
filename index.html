@@ -4,9 +4,9 @@
   <script type="text/javascript" src="blogs.json"></script>
   
   <script>
-  function loadBlog(id) {
+  function loadBlog(file) {
     $.ajax({
-      url : "blogs/" + blogs[id].file,
+      url : "blogs/" + file,
       dataType: "html",
       success : function (data) {
         $("main-content").html(data);
@@ -52,7 +52,7 @@
   $('div.blogs').html( blogList );
   
   for (var i = 0; i < blogs.length; i++) { 
-    document.getElementById("blog" + (i+1)).onclick = loadBlog(i+1);
+    document.getElementById("blog" + (i+1)).onclick = loadBlog(blogs[i].file);
   }
   </script>
 </html>
