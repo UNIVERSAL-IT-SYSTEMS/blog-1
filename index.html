@@ -53,8 +53,8 @@
   blogList += '</ul>';
   $('div.blogs').html( blogList );
   
-  var gotoBlog = Number(location.search.substr(1));
-  if (Number.isInteger(gotoBlog)) {
+  var gotoBlog = location.search.substr(1);
+  if (gotoBlog != '' && Number.isInteger(Number(gotoBlog))) {
     if (blogs[gotoBlog] !== undefined) {
       loadBlog(blogs[gotoBlog].file, blogs[gotoBlog].id);
     }
