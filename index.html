@@ -55,8 +55,10 @@
   
   var gotoBlog = location.search.substr(1);
   if (gotoBlog != '' && Number.isInteger(Number(gotoBlog))) {
-    if (blogs[gotoBlog] !== undefined) {
-      loadBlog(blogs[gotoBlog].file, blogs[gotoBlog].id);
+    for (var i = 0; i < blogs.length; i++) {
+      if (blogs[i].id == gotoBlog) {
+        loadBlog(blogs[i].file, blogs[i].id);
+      }
     }
   }
   </script>
