@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en-us">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script type="text/javascript" src="blogs.json"></script>
+  
   <head>
     <meta charset="UTF-8">
     <title>Works Of Barry by WorksOfBarry</title>
@@ -20,9 +23,22 @@
     <section class="main-content">
     
       <p>Welcome to the Works Of Barry blog. Here you can find updates and latest blogs by Liam.</p>
-
+      <p>
+        <div class="blogs"></div>
+      </p>
     </section>
 
   
   </body>
+  <script>
+  const NEW = '<font color="RED">new</font>';
+  var blogList = '<ul>';
+  for (var i = 0; i < blogs.length; i++) {
+    
+    blogList += '<li>' + blogs[i].name + ' ' + (i == 0 ? NEW : '') + '</li>';
+  }
+  blogList += '</ul>';
+  console.log(blogList);
+  $('div.blogs').html( blogList );
+  </script>
 </html>

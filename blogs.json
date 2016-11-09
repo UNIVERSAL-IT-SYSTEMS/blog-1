@@ -1,47 +1,47 @@
-foos : [
+var blogs = [
   {
-    "id":"1",
-    "name":"RPGLE - Starting off with Embedded SQL"
-    "file":"RPGLE - Starting off with Embedded SQL.html"
-  },
-  {
-    "id":"2",
-    "name":"RPGLE - Embedded SQL error handling"
-    "file":"RPGLE - Embedded SQL error handling.html"
-  },
-  {
-    "id":"3",
-    "name":"RPGLE - Writing and reading IFS files"
-    "file":"RPGLE - Writing and reading IFS files.html"
-  },
-  {
-    "id":"4",
-    "name":"RPGLE - Web Requests with Embedded SQL"
-    "file":"RPGLE - Web Requests with Embedded SQL.html"
-  },
-  {
-    "id":"5",
-    "name":"Life Update (1)"
-    "file":"LifeUpdate1.html"
-  },
-  {
-    "id":"6",
-    "name":"RPGLE - Creating and writing to spool files"
-    "file":"RPGLE - Creating and writing to spool files.html"
-  },
-  {
-    "id":"7",
-    "name":"RPGLE - Calling ILE programs from SQL (Node, PHP, Python)"
-    "file":"RPGLE - Calling ILE programs from SQL (Node-PHP-Python).html"
+    "id":"9",
+    "name":"RPGLE - Manual Memory Management",
+    "file":"RPGLE - Manual Memory Management.html"
   },
   {
     "id":"8",
-    "name":"RPGLE - Uppercase in one line (Embedded SQL)"
+    "name":"RPGLE - Uppercase in one line (Embedded SQL)",
     "file":"RPGLE - Uppercase in one line (Embedded SQL)"
   },
   {
-    "id":"9",
-    "name":"RPGLE - Manual Memory Management"
-    "file":"RPGLE - Manual Memory Management.html"
+    "id":"7",
+    "name":"RPGLE - Calling ILE programs from SQL (Node, PHP, Python)",
+    "file":"RPGLE - Calling ILE programs from SQL (Node-PHP-Python).html"
+  },
+  {
+    "id":"6",
+    "name":"RPGLE - Creating and writing to spool files",
+    "file":"RPGLE - Creating and writing to spool files.html"
+  },
+  {
+    "id":"5",
+    "name":"Life Update (1)",
+    "file":"LifeUpdate1.html"
+  },
+  {
+    "id":"4",
+    "name":"RPGLE - Web Requests with Embedded SQL",
+    "file":"RPGLE - Web Requests with Embedded SQL.html"
+  },
+  {
+    "id":"3",
+    "name":"RPGLE - Writing and reading IFS files",
+    "file":"RPGLE - Writing and reading IFS files.html"
+  },
+  {
+    "id":"2",
+    "name":"RPGLE - Embedded SQL error handling",
+    "file":"RPGLE - Embedded SQL error handling.html"
+  },
+  {
+    "id":"1",
+    "name":"RPGLE - Starting off with Embedded SQL",
+    "file":"RPGLE - Starting off with Embedded SQL.html"
   }
-]
+];
