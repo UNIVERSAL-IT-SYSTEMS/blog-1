@@ -4,14 +4,18 @@
   <script type="text/javascript" src="blogs.json"></script>
   
   <script>
-  function loadBlog(file, id) {
+  function loadBlog(name, file, id) {
+    //NAUGHTY HARD CODED LINK!!
+    var title = '<h2><a href="https://worksofbarry.github.io/blog/?' + id + '">' + name + '</a></h2>';
     $.ajax({
       url : "blogs/" + file,
       dataType: "html",
       success: function (data) {
+        $(".main-title").hide().html(title).fadeIn('slow');
         $(".main-content").hide().html(data).fadeIn('fast');
       },
       error: function () {
+        $(".main-title").hide().html(title).fadeIn('fast');
         $(".main-content").hide().html('Failed to load blog! :(').fadeIn('medium');
       }
     });
@@ -35,6 +39,8 @@
       <a href="https://github.com/WorksOfBarry/" class="btn">GitHub</a>
     </section>
 
+    <div class="main-title">
+    </div>
     <div class="main-content">
       <p>Welcome to the Works Of Barry blog. Here you can find updates and latest blogs by Liam.</p>
       <p>
@@ -48,7 +54,7 @@
   const NEW = '<font color="RED">newest</font>';
   var blogList = '<ul>';
   for (var i = 0; i < blogs.length; i++) {
-    blogList += '<li><a onclick="loadBlog(blogs[' + i + '].file, ' + i + ')" id="blog' + i + '">' + blogs[i].name + '</a> ' + (i == 0 ? NEW : '') + '</li>';
+    blogList += '<li><a onclick="loadBlog(blogs[' + i + '].name, blogs[' + i + '].file, blogs[' + i + '].id)" id="blog' + i + '">' + blogs[i].name + '</a> ' + (i == 0 ? NEW : '') + '</li>';
   }
   blogList += '</ul>';
   $('div.blogs').html( blogList );
@@ -57,7 +63,7 @@
   if (gotoBlog != '' && Number.isInteger(Number(gotoBlog))) {
     for (var i = 0; i < blogs.length; i++) {
       if (blogs[i].id == gotoBlog) {
-        loadBlog(blogs[i].file, blogs[i].id);
+        loadBlog(blogs[i].name, blogs[i].file, blogs[i].id);
       }
     }
   }
