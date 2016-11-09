@@ -48,7 +48,7 @@
   const NEW = '<font color="RED">newest</font>';
   var blogList = '<ul>';
   for (var i = 0; i < blogs.length; i++) {
-    blogList += '<li><a onclick="loadBlog(blogs[' + i + '].file)" id="blog' + i + '">' + blogs[i].name + ' ' + (i == 0 ? NEW : '') + '</a></li>';
+    blogList += '<li><a onclick="loadBlog(blogs[' + i + '].file)" id="blog' + i + '">' + blogs[i].name + '</a> ' + (i == 0 ? NEW : '') + '</li>';
   }
   blogList += '</ul>';
   $('div.blogs').html( blogList );
