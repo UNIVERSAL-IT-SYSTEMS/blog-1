@@ -1,0 +1,70 @@
+<p>This blog is a follow up from "A better way to read a file in the IFS with RPG" <a href="http://www.rpgpgm.com/2016/03/a-better-way-to-read-file-in-ifs-with.html">on RPGPGM.com</a>. Writing to the IFS can be important. It can be really useful to store your own log files instead of writing to a physical file.. it may even be slightly easier. When I say file in this blog post, I mean IFS stream file - not physical file.</p>
+
+<p>As a standard, I use this Template data structure for each IFS file I want to create or open in my file:</p>
+
+<pre>
+<a name="line44"></a><font color="#ff0000">Dcl-Ds</font><font color="#000000"> File_Temp </font><font color="#800000">Qualified</font> <font color="#800000">Template</font><font color="#800080">;</font>
+<a name="line45"></a><font color="#000000">  PathFile </font><font color="#800000">char</font><font color="#800080">(</font><font color="#000000">128</font><font color="#800080">);</font>
+<a name="line46"></a><font color="#000000">  RtvData  </font><font color="#800000">char</font><font color="#800080">(</font><font color="#000000">256</font><font color="#800080">);</font>
+<a name="line47"></a><font color="#000000">  OpenMode </font><font color="#800000">char</font><font color="#800080">(</font><font color="#0000ff">5</font><font color="#800080">);</font>
+<a name="line48"></a><font color="#000000">  FilePtr  </font><font color="#800000">pointer</font> <font color="#800000">inz</font><font color="#800080">;</font>
+<a name="line49"></a><font color="#ff0000">End-ds</font><font color="#800080">;</font>
+</pre>
+
+<p>I define <code>PathFile</code> as a <code>Char(128)</code> because I don't usually have paths that are more than 128 characters long. <code>RtvData</code> should be the longest length of a line that you will find in any stream file that you open. <code>OpenMode</code> requires a bit more knowlegde. There are different 'open codes' for different types of operations - such as reading, appending or overwrite. You can find a list of codes available <a href="http://www.mcpressonline.com/programming/rpg/reading-ifs-files-in-rpg.html">on this MCPress article by Robert Cozzi</a> (about half way down).</p>
+
+<p>Next you will want the four prototypes I use for all my code, which will talk more about later.</p>
+<pre>
+<a name="line20"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> OpenFile </font><font color="#800000">pointer</font> <font color="#800000">extproc</font><font color="#800080">(</font><font color="#008000">'_C_IFS_fopen'</font><font color="#800080">);</font>
+<a name="line21"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//File name</font>
+<a name="line22"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//File mode</font>
+<a name="line23"></a><font color="#ff0000">end-pr</font><font color="#800080">;</font>
+<a name="line24"></a>
+<a name="line25"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> ReadFile </font><font color="#800000">pointer</font> <font color="#800000">extproc</font><font color="#800080">(</font><font color="#008000">'_C_IFS_fgets'</font><font color="#800080">);</font>
+<a name="line26"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Retrieved data</font>
+<a name="line27"></a><font color="#000000">  *n </font><font color="#800000">int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Data size</font>
+<a name="line28"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Misc pointer</font>
+<a name="line29"></a><font color="#ff0000">end-pr</font><font color="#800080">;</font>
+<a name="line30"></a>
+<a name="line31"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> WriteFile </font><font color="#800000">pointer</font> <font color="#800000">extproc</font><font color="#800080">(</font><font color="#008000">'_C_IFS_fwrite'</font><font color="#800080">);</font>
+<a name="line32"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Write data</font>
+<a name="line33"></a><font color="#000000">  *n </font><font color="#800000">int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Data size</font>
+<a name="line34"></a><font color="#000000">  *n </font><font color="#800000">int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Block size</font>
+<a name="line35"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Misc pointer</font>
+<a name="line36"></a><font color="#ff0000">end-pr</font><font color="#800080">;</font>
+<a name="line37"></a>
+<a name="line38"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> CloseFile </font><font color="#800000">extproc</font><font color="#800080">(</font><font color="#008000">'_C_IFS_fclose'</font><font color="#800080">);</font>
+<a name="line39"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Misc pointer</font>
+<a name="line40"></a><font color="#ff0000">end-pr</font><font color="#800080">;</font>
+</pre>
+
+<p>I use <code>OpenMode = 'ab' + x'00'</code> to overwrite (or create) files and I use <code>OpenMode = 'r' + x'00'</code> if I am purely reading a file. I am basing my code off two different sources file which are both open-source under the Relic Package Manager repository - they both use the data structure I declared at the top of this blog.</p>
+
+<h3>Reading a file</h3>
+<p>This section of code comes from RELIC.SQLRPGLE. The logic of this code is to open a 'build file' and read through it's content. I firstly need to declare a new data structure over the template we created earlier.</p>
+
+<pre>
+<a name="line51"></a><font color="#ff0000">Dcl-Ds</font><font color="#000000"> gBuildFile </font><font color="#800000">LikeDS</font><font color="#800080">(</font><font color="#000000">File_Temp</font><font color="#800080">);</font>
+</pre>
+
+<p>Now we can store anything relevant to this specific file in this data structure, great! Next we need to put data into some of the sub-fields within our <code>gBuildFile</code> data structure.</p>
+
+<pre>
+<a name="line242"></a><font color="#008080">//Process the build file</font>
+<a name="line243"></a><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">PathFile </font><font color="#800080">=</font> <font color="#008000">'build.txt'</font> <font color="#800080">+</font> <font color="#008000">x'00'</font><font color="#800080">;</font>
+<a name="line244"></a><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">OpenMode </font><font color="#800080">=</font> <font color="#008000">'r'</font> <font color="#800080">+</font> <font color="#008000">x'00'</font><font color="#800080">;</font>
+<a name="line245"></a><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">FilePtr  </font><font color="#800080">=</font><font color="#000000"> OpenFile</font><font color="#800080">(</font><font color="#0000ff">%addr</font><font color="#800080">(</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">PathFile</font><font color="#800080">)</font>
+<a name="line246"></a>                              <font color="#800080">:</font><font color="#0000ff">%addr</font><font color="#800080">(</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">OpenMode</font><font color="#800080">));</font>
+</pre>
+
+<p>Now, you may be asking what <code><font color="#008000">x'00'</font></code> is. As Simon says on his blog, he is null terminating the character fields. This basically tells the function where to stop reading. As a side note, if you don't explicitly specify the path of the file it will use your current directory. Like I mentioned earlier, I am using <code>r</code> for read mode on the file I have specified.</p>
+
+<p>What if the file didn't open? What if it didn't exist or some something stupid has happened and you can't open the file? We'd need to handle that of course. This simple if statement checks if the pointer to the file is <code><font color="#808000">*null</font></code>, and if it is then it's not working.</p>
+
+<pre>
+<a name="line248"></a><font color="#800080">If</font> <font color="#800080">(</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">FilePtr </font><font color="#800080">=</font> <font color="#808000">*null</font><font color="#800080">);</font>
+<a name="line249"></a><font color="#000000">  Print</font><font color="#800080">(</font><font color="#008000">'Failed to read build file.'</font><font color="#800080">);</font>
+<a name="line250"></a>  <font color="#800080">Return</font> <font color="#808000">*Off</font><font color="#800080">;</font>
+<a name="line251"></a><font color="#800080">EndIf;</font>
+</pre>
+

@@ -1,0 +1,64 @@
+<p>Following on from the last blog, this one will extend your Embedded SQL knowledge. This blog will mainly focus on two things. First: <code>SQLSTATE</code> and how to use it to your advantage. Second: Dynamic SQL queries in Embedded SQL</p>
+
+<p><code>SQLSTATE</code> is define as a <code>Char(5)</code>, although for this tutorial we're only really interested in the first 2 characters (<code>%Subst(SQLSTATE:1:2)</code>). You can find out what those two character codes mean <a href="http://publib.boulder.ibm.com/html/as400/v4r5/ic2979/info/db2/rbafymstretcode.htm">here</a>. We're going to look at the following (for this tutorial):</p>
+
+<p><table border=5>
+<tr>
+<td>00</td>
+<td>Unqualified Successful Completion</td>
+<td>It works!</td>
+</tr>
+
+<tr>
+<td>01</td>
+<td>Warning</td>
+<td>Something broke(d)!</td>
+</tr>
+
+<tr>
+<td>02</td>
+<td>No Data</td>
+<td>Couldn't find the data you wanted</td>
+</tr>
+</table></p>
+<br><br>
+
+<p>I also want to let you know, if you plan on debugging embedded SQL which affects a physical file in a *PROD library, make sure you <code>STRDBG</code> with <code>UPDPROD(*YES)</code> otherwise you'll get some weird <code>SQLSTATE</code> like 42 or 54. When you're debugging Embedded SQL and something goes wrong, always <code>EVAL SQLSTATE</code> and then <code>DSPJOBLOG</code>.. Embedded SQL will always print to the job log if you're debugging.</p>
+
+<p>Back to the blog; In the previous blog, I used the following as an example:</p>
+<p><pre>
+<a name="line19"></a><font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">SELECT</font><font color="#000000"> CUS_BAL,</font>
+<a name="line20"></a><font color="#000000">                CUS_NAME</font>
+<a name="line21"></a>         <font color="#0000ff">INTO</font><font color="#000000">   :Customer.CUS_BAL,</font>
+<a name="line22"></a><font color="#000000">                :Customer.CUS_NAME</font>
+<a name="line23"></a>         <font color="#0000ff">FROM</font><font color="#000000">   CUSTOMERS</font>
+<a name="line24"></a>         <font color="#0000ff">WHERE</font><font color="#000000">  CUS_ID = 1;</font>
+<a name="line25"></a>
+<a name="line26"></a><font color="#000000">printf</font><font color="#800080">(</font><font color="#000000">Customer</font><font color="#800080">.</font><font color="#000000">CUS_NAME </font><font color="#800080">+</font> <font color="#008000">x'25'</font><font color="#800080">);</font>
+</pre></p>
+
+<p>But what if there is an error? At the moment, we're just printing <code>Customer.CUS_NAME</code> no matter what happens. Let's handle that using some of the 2 character codes we'd spoken about earlier. I'm using a <code>SELECT</code> and <code>WHEN</code> to check the value of <code>gSql</code>. <code>gSql</code> is defined like so and we only assign to <code>gSql</code> after we have used <code>EXEC SQL</code> statements. You may want to replace the static strings with constants.</p>
+<p><pre>
+<a name="line19"></a><font color="#ff0000">Dcl-S</font><font color="#000000">  gSql </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">2</font><font color="#800080">);</font>
+
+<a name="line44"></a><font color="#008080">//Embedded SQL happens here</font>
+
+<a name="line28"></a><font color="#000000">gSql </font><font color="#800080">=</font> <font color="#0000ff">%Subst</font><font color="#800080">(</font><font color="#000000">SQLSTATE</font><font color="#800080">:</font><font color="#0000ff">1</font><font color="#800080">:</font><font color="#0000ff">2</font><font color="#800080">);</font>
+
+<a name="line30"></a><font color="#800080">Select;</font>
+<a name="line31"></a>  <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">gSql </font><font color="#800080">=</font> <font color="#008000">'00'</font><font color="#800080">);</font>
+<a name="line32"></a><font color="#000000">    printf</font><font color="#800080">(</font><font color="#000000">Customer</font><font color="#800080">.</font><font color="#000000">CUS_NAME </font><font color="#800080">+</font> <font color="#008000">x'25'</font><font color="#800080">);</font>
+<a name="line33"></a>
+<a name="line34"></a>  <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">gSql </font><font color="#800080">=</font> <font color="#008000">'01'</font><font color="#800080">);</font>
+<a name="line35"></a><font color="#000000">    printf</font><font color="#800080">(</font><font color="#008000">'Probably worked, but with warnings. '</font>
+<a name="line36"></a>         <font color="#800080">+</font> <font color="#008000">'Check job log?'</font> <font color="#800080">+</font> <font color="#008000">x'25'</font><font color="#800080">);</font>
+<a name="line37"></a>
+<a name="line38"></a>  <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">gSql </font><font color="#800080">=</font> <font color="#008000">'02'</font><font color="#800080">);</font>
+<a name="line39"></a><font color="#000000">    printf</font><font color="#800080">(</font><font color="#008000">'No relevant data'</font> <font color="#800080">+</font> <font color="#008000">x'25'</font><font color="#800080">);</font>
+<a name="line40"></a>
+<a name="line41"></a>  <font color="#800080">Other;</font>
+<a name="line42"></a><font color="#000000">    printf</font><font color="#800080">(</font><font color="#008000">'It''s worse: '</font> <font color="#800080">+</font><font color="#000000"> gSql </font><font color="#800080">+</font> <font color="#008000">x'25'</font><font color="#800080">);</font>
+<a name="line43"></a><font color="#800080">ENDSL;</font>
+</pre></p>
+
+<p>I know it seems basic, but this type of validation may allow you to handle issues better - even display nice popups to say that no data was found.</p>

@@ -1,0 +1,18 @@
+<p>I've just seen this <a href="http://www.wachs.dk/ile-rpg-function-convert-string-upperlower-case/">blog post</a> and I do only have a two issues with it:
+<ul>
+  <li>For code that's written in 2016, it's still in fixed format.</li>
+  <li>It's so much code just to do an upper case that supports multiple CCSIDs.</li>
+</ul>
+</p>
+
+<p>In this small blog, I'm going to show you how to do 'uppercase' in one line of code - using Embedded SQL.</p>
+
+<pre>
+<a name="line7"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> CharField </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">100</font><font color="#800080">);</font>
+
+<a name="line9"></a><font color="#000000">CharField </font><font color="#800080">=</font> <font color="#008000">'hello db2 summit!'</font><font color="#800080">;</font>
+
+<a name="line11"></a><font color="#000080">EXEC</font> <font color="#000080">SQL</font> <font color="#0000ff">SET</font><font color="#000000"> :CharField = </font><font color="#804000">UPPER</font><font color="#000000">(:CharField);</font>
+</pre>
+
+<p>..and that's it.</p>

@@ -1,0 +1,101 @@
+<p>Once again I write another blog post about how great I find embedded SQL within RPG - this time we talk about web requests. This isn't really much of a blog post either.. it's really just a 'text version' of a session I am giving at the RPG and DB2 Summit.</p>
+
+<p>These are the things we're going to look at:
+<ul>
+    <li><code>SQLTYPE</code></li>
+    <li>HTTPGETCLOB</li>
+    <li>HTTPPOSTCLOB</li>
+</ul>
+Not a massive list, but a lot to talk about.</p>
+
+<br><br>
+<h2>SQLTYPE</h2>
+<p><code>SQLTYPE</code> is a new keyword in RPG for when you're declaring variables.. only really useful if you're using Embedded SQL in your programs. When the <code>SQLTYPE</code> keyword is used, it secretly creates a data structure under the covers (but only for certain SQL types)</p>
+
+<p>These are some of the available types:
+<ul>
+<li>CLOB</li>
+<li>CLOB_LOCATOR</li>
+<li>CLOB_FILE</li>
+<li>BLOB</li>
+<li>BLOB_LOCATOR</li>
+<li>BLOB_FILE</li>
+<li>DBCLOB_LOCATOR</li>
+<li>DBCLOB_FILE</li>
+<li>The list could go on..</li>
+</ul>
+So this makes the syntax <code>Dcl-S gSQLVar SQLTYPE(<i>[SQLTYPE]</i>:<i>[len]</i>);</code>.</p>
+
+<p>When I say 'creates a data-structure' - I mean it really does. Take a look at this diagram:
+<br><br><img width="100%" src="http://i.imgur.com/f0KuixU.png"></p>
+
+<br><br>
+<h2>HTTPGETCLOB</h2>
+<p>HTTPGETCLOB has two parameters. The first is the URL which it will send the request to and the second are the headers you want to give the request You can read more about the headers parameter <a href="https://www.ibm.com/developerworks/data/library/techarticle/dm-1105httprestdb2/">here</a> in the 'Sending customized HTTP header values' section.
+
+<p>In this 'get clob' example, I send a simple GET request to a URL (which you can replace with a host variable) and it will give the response back. It's pretty neat! Notice that when we declare our CLOB, we also give it a type.<p>
+
+<pre>
+<a name="line5"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> WebResponse SQLTYPE</font><font color="#800080">(</font><font color="#000000">CLOB</font><font color="#800080">:</font><font color="#0000ff">256</font><font color="#800080">);</font>
+<a name="line6"></a>
+<a name="line7"></a><font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">SET</font><font color="#000000"> :WebResponse = SYSTOOLS.HTTPGETCLOB (</font><font color="#008000">'https://api.bitcoinaverage.com/ticker/EUR/'</font><font color="#000000">,</font><font color="#008000">''</font><font color="#000000">);</font>
+</pre>
+
+<p>If you debug this statement in STRDBG, after you've steped through it you can do <code>eval WebResponse_Data</code> to view the response and <code>eval WebResponse_Len</code> to view the length of the response.</p>
+
+<p>You can do this same SQL statement within an SQL client (Run SQL Scripts in ACS or STRSQL..): <br><code>SELECT SYSTOOLS.HTTPGETCLOB('https://api.bitcoinaverage.com/ticker/EUR/', '') FROM SYSIBM.SYSDUMMY1</code></p>
+
+<br><br>
+<h2>HTTPPOSTCLOB</h2>
+<p>HTTPPOSTCLOB is kinda like HTTPPOSTCLOB, but with the 'post clob' you get an extra parameter which allows you to pass the body of the request (which makes it a POST request).</p>
+
+<p>I like to keep my code quite tidy, so I have my response variable (<code>gData</code>) and I usually have a data structure to store the URL, header and body of the request in - then we initialize them with the relevant data for the request.</p>
+
+<pre>
+<a name="line5"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> gData SQLTYPE</font><font color="#800080">(</font><font color="#000000">CLOB</font><font color="#800080">:</font><font color="#0000ff">2000</font><font color="#800080">);</font>
+<a name="line6"></a><font color="#ff0000">Dcl-Ds</font><font color="#000000"> Request </font><font color="#800000">Qualified</font><font color="#800080">;</font>
+<a name="line7"></a><font color="#000000">  URL  </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">128</font><font color="#800080">);</font>
+<a name="line8"></a><font color="#000000">  Head </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">1024</font><font color="#800080">);</font>
+<a name="line9"></a><font color="#000000">  Body </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">1024</font><font color="#800080">);</font>
+<a name="line10"></a><font color="#ff0000">END-DS</font><font color="#800080">;</font>
+<a name="line11"></a>
+<a name="line12"></a><font color="#000000">Request</font><font color="#800080">.</font><font color="#000000">Body </font><font color="#800080">=</font> <font color="#008000">'&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;'</font>
+<a name="line13"></a>    <font color="#800080">+</font> <font color="#008000">'&lt;soap:Envelope xmlns:soap='</font>
+<a name="line14"></a>    <font color="#800080">+</font> <font color="#008000">'&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; '</font>
+<a name="line15"></a>    <font color="#800080">+</font> <font color="#008000">'xmlns:xsi='</font>
+<a name="line16"></a>    <font color="#800080">+</font> <font color="#008000">'&quot;http://www.w3.org/2001/XMLSchema-instance&quot; '</font>
+<a name="line17"></a>    <font color="#800080">+</font> <font color="#008000">'xmlns:xsd='</font>
+<a name="line18"></a>    <font color="#800080">+</font> <font color="#008000">'&quot;http://www.w3.org/2001/XMLSchema&quot; '</font>
+<a name="line19"></a>    <font color="#800080">+</font> <font color="#008000">'xmlns:wiz=&quot;http://wizard.ws&quot;&gt;'</font>
+<a name="line20"></a>      <font color="#800080">+</font> <font color="#008000">'&lt;soap:Body&gt;'</font>
+<a name="line21"></a>        <font color="#800080">+</font> <font color="#008000">'&lt;thing:addressInput&gt;'</font>
+<a name="line22"></a>          <font color="#800080">+</font> <font color="#008000">'&lt;Locale&gt;pl&lt;/Locale&gt;'</font>
+<a name="line23"></a>          <font color="#800080">+</font> <font color="#008000">'&lt;ServiceAddressId&gt;0&lt;/ServiceAddressId&gt;'</font>
+<a name="line24"></a>          <font color="#800080">+</font> <font color="#008000">'&lt;AccountNumber&gt;1234&lt;/AccountNumber&gt;'</font>
+<a name="line25"></a>          <font color="#800080">+</font> <font color="#008000">'&lt;MemoOpenDate&gt;2016-01-01&lt;/MemoOpenDate&gt;'</font>
+<a name="line26"></a>        <font color="#800080">+</font> <font color="#008000">'&lt;/thing:addressDetailInput&gt;'</font>
+<a name="line27"></a>      <font color="#800080">+</font> <font color="#008000">'&lt;/soap:Body&gt;'</font>
+<a name="line28"></a>    <font color="#800080">+</font> <font color="#008000">'&lt;/soap:Envelope&gt;'</font><font color="#800080">;</font>
+<a name="line29"></a>
+<a name="line30"></a><font color="#000000">Request</font><font color="#800080">.</font><font color="#000000">Head </font><font color="#800080">=</font> <font color="#008000">'&lt;httpHeader&gt;'</font>
+<a name="line31"></a>               <font color="#800080">+</font> <font color="#008000">'&lt;header name=&quot;Content-Type&quot; '</font>
+<a name="line32"></a>               <font color="#800080">+</font> <font color="#008000">'value=&quot;text/xml;charset=UTF-8&quot; /&gt;'</font>
+<a name="line33"></a>               <font color="#800080">+</font> <font color="#008000">'&lt;header name=&quot;Content-Length&quot; value=&quot;'</font>
+<a name="line34"></a>               <font color="#800080">+</font> <font color="#0000ff">%Char</font><font color="#800080">(</font><font color="#0000ff">%Len</font><font color="#800080">(</font><font color="#0000ff">%TrimR</font><font color="#800080">(</font><font color="#000000">Request</font><font color="#800080">.</font><font color="#000000">Body</font><font color="#800080">)))</font>
+<a name="line35"></a>               <font color="#800080">+</font> <font color="#008000">'&quot; /&gt;'</font> <font color="#008080">//Length of the body</font>
+<a name="line36"></a>               <font color="#800080">+</font> <font color="#008000">'&lt;header name=&quot;Accept-Encoding&quot; value=&quot;gzip,deflate&quot; /&gt;'</font>
+<a name="line37"></a>             <font color="#800080">+</font> <font color="#008000">'&lt;/httpHeader&gt;'</font><font color="#800080">;</font>
+<a name="line38"></a>
+<a name="line39"></a><font color="#000000">Request</font><font color="#800080">.</font><font color="#000000">URL </font><font color="#800080">=</font> <font color="#008000">'http://yourserver:1234/SomeWS/SomeWebServices'</font><font color="#800080">;</font>
+<a name="line40"></a>
+<a name="line41"></a><font color="#000080">EXEC</font> <font color="#000080">SQL</font> <font color="#0000ff">SET</font><font color="#000000"> :gData = SYSTOOLS.HTTPPOSTCLOB(</font>
+<a name="line42"></a><font color="#000000">                        :Request.</font><font color="#0000ff">URL</font><font color="#000000">,</font>
+<a name="line43"></a><font color="#000000">                        :Request.Head,</font>
+<a name="line44"></a><font color="#000000">                        :Request.Body</font>
+<a name="line45"></a><font color="#000000">                      );</font>
+</pre>
+
+<p>If you then debug this <code>EXEC SQL</code> statement and <code>eval gData</code> you'll see the response length and the actual response: 
+<br><br><img width="100%" src="http://i.imgur.com/4jcvPJX.png"></p>
+
+<p>Well I hope this generally a useful post.. I will go into a lot more detail during the session - this is just the basics.</p>

@@ -1,0 +1,69 @@
+<p>I found out recently that it's so simple to create and write to spool files. Why you would you want to write to spool files, you may ask. I want spool files to be written to as logs. For example, with Relic Package Manager, you have an option to print the log to the screen as a build happens - or instead to print it to a spool file (useful with SBMJOBs).</p>
+
+<p>There really is only four lines that we need to declare, open, write and close. Oh, we also need to delcare a data structure since <code>WRITE</code> only accepts a data structure with single subfield of Char(132) in this instance - I have no idea why, but seems very odd.</p>
+
+<p>
+<ol>
+  <li><code><font color="#ff0000">Dcl-F</font><font color="#000000"> QsysPrt </font><font color="#800000">Printer</font><font color="#800080">(</font><font color="#0000ff">132</font><font color="#800080">)</font> <font color="#800000">UsrOpn</font><font color="#800080">;</font></code> is used to declare a printer.</li>
+  <br>
+  <li>
+<pre>
+<font color="#ff0000">Dcl-Ds</font><font color="#000000"> gLine</font><font color="#800080">;</font>
+<font color="#000000">  *N </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">132</font><font color="#800080">);</font>
+<font color="#ff0000">End-Ds</font><font color="#800080">;</font>
+</pre>We need this DS as the Write opcode only accepts a DS. Notice that the length of the subfield is the same length as the Printer in declaration of <code>QsysPrt</code>.
+  </li>
+  <br>
+  <li><code><font color="#ff0000">Open</font><font color="#000000"> QsysPrt</font><font color="#800080">;</font></code> is used to open the printer, which actually creates the spool file.</li>
+  <br>
+  <li><code><font color="#ff0000">Write</font><font color="#000000"> QsysPrt gLine</font><font color="#800080">;</font></code> writes a line to the spool file. Note that if gLine is <code>*BLANK</code> nothing will write.</li>
+  <br>
+  <li><code><font color="#ff0000">Close</font><font color="#000000"> QsysPrt</font><font color="#800080">;</font></code> closes the spool file, ending the ability to write.</li>
+</ol>
+</p>
+
+<h4>Program example</h4>
+
+<p>Let's take this example program
+<pre>
+<a name="line7"></a><font color="#ff0000">Dcl-F</font><font color="#000000"> QsysPrt </font><font color="#800000">Printer</font><font color="#800080">(</font><font color="#0000ff">132</font><font color="#800080">)</font> <font color="#800000">UsrOpn</font><font color="#800080">;</font>
+<a name="line8"></a>
+<a name="line9"></a><font color="#ff0000">Dcl-Ds</font><font color="#000000"> gLine</font><font color="#800080">;</font>
+<a name="line10"></a><font color="#000000">  *N </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">132</font><font color="#800080">);</font>
+<a name="line11"></a><font color="#ff0000">End-Ds</font><font color="#800080">;</font>
+<a name="line12"></a>
+<a name="line13"></a><font color="#008080">//******************</font>
+<a name="line14"></a>
+<a name="line15"></a><font color="#ff0000">Open</font><font color="#000000"> QsysPrt</font><font color="#800080">;</font>
+<a name="line16"></a>
+<a name="line17"></a><font color="#000000">gLine </font><font color="#800080">=</font> <font color="#008000">'Spool file line 1'</font><font color="#800080">;</font>
+<a name="line18"></a><font color="#ff0000">Write</font><font color="#000000"> QsysPrt gLine</font><font color="#800080">;</font>
+<a name="line19"></a>
+<a name="line20"></a><font color="#000000">gLine </font><font color="#800080">=</font> <font color="#008000">'Spool file line 2'</font><font color="#800080">;</font>
+<a name="line21"></a><font color="#ff0000">Write</font><font color="#000000"> QsysPrt gLine</font><font color="#800080">;</font>
+<a name="line22"></a>
+<a name="line23"></a><font color="#000000">gLine </font><font color="#800080">=</font> <font color="#008000">'Spool file line 3'</font><font color="#800080">;</font>
+<a name="line24"></a><font color="#ff0000">Write</font><font color="#000000"> QsysPrt gLine</font><font color="#800080">;</font>
+<a name="line25"></a>
+<a name="line26"></a><font color="#000000">gLine </font><font color="#800080">=</font> <font color="#008000">''</font><font color="#800080">;</font>
+<a name="line27"></a><font color="#ff0000">Write</font><font color="#000000"> QsysPrt gLine</font><font color="#800080">;</font>
+<a name="line28"></a>
+<a name="line29"></a><font color="#000000">gLine </font><font color="#800080">=</font> <font color="#008000">'Spool file line 5'</font><font color="#800080">;</font>
+<a name="line30"></a><font color="#ff0000">Write</font><font color="#000000"> QsysPrt gLine</font><font color="#800080">;</font>
+<a name="line31"></a>
+<a name="line32"></a><font color="#ff0000">Close</font><font color="#000000"> QsysPrt</font><font color="#800080">;</font>
+<a name="line33"></a>
+<a name="line34"></a><font color="#000000">*InLR </font><font color="#800080">=</font> <font color="#808000">*On</font><font color="#800080">;</font>
+<a name="line35"></a><font color="#800080">Return;</font>
+</pre>
+</p>
+
+<p>After you have compiled this code (I called my program <code>TEST1</code>) you can call it (<code>CALL TEST1</code>), which should result on something on your user OUTQ - at least mine did. You should notice that the name of the spool file is what we named our declared file in the RPG program and that the User Data is the name of the program.</p>
+
+<img src="http://i.imgur.com/leEieoV.png">
+
+<p>If you use 5 to display against the spool file, the output should be what you had written in your program.</p>
+
+<img src="http://i.imgur.com/eDj1Kdj.png">
+
+<p>That's it! I hope this helped you in developing some useful tool you're making.</p>

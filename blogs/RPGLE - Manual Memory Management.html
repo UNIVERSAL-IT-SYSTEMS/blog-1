@@ -1,0 +1,113 @@
+<p>This is quite a new topic for me, but over the last few days I've been using them more and more so I thought I'd write about it. In this blog I will be using <code>STRDBG</code> since I recently stopped using Rational Developer for i for development.</p>
+
+<p>In this, we'll talk about allocating space for null-terminated strings in RPG. It's going to cover the <code>Pointer</code> type, <code>%Alloc</code>, <code>Dealloc</code> and <code>%Str</code></p>
+
+<h3>Pointer Type</h3>
+<p>The pointer type is quite simple. It holds a value which points to somewhere in memory. When you define a pointer, the initial value will be <code>*Null</code>.</p>
+
+<p>Next, I'm going to compile this program and start debugging it so we can see what a pointer value looks like.
+<pre>
+<a name="line5"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> Text   </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">32</font><font color="#800080">);</font>
+<a name="line6"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> Pointy </font><font color="#800000">Pointer</font> <font color="#800000">Inz</font><font color="#800080">(</font><font color="#808000">*Null</font><font color="#800080">);</font>
+<a name="line7"></a><font color="#008080">//I could of also used Inz(%Addr(Text))</font>
+<a name="line8"></a>
+<a name="line9"></a><font color="#000000">Text   </font><font color="#800080">=</font> <font color="#008000">'Hello WorksOfBarry blog!'</font><font color="#800080">;</font>
+<a name="line10"></a><font color="#000000">Pointy </font><font color="#800080">=</font> <font color="#0000ff">%Addr</font><font color="#800080">(</font><font color="#000000">Text</font><font color="#800080">);</font>
+<a name="line11"></a>
+<a name="line12"></a><font color="#008080">//Breakpoint here.</font>
+<a name="line13"></a>
+<a name="line14"></a><font color="#000000">*InLR </font><font color="#800080">=</font> <font color="#808000">*On</font><font color="#800080">;</font>
+<a name="line15"></a><font color="#800080">Return;</font>
+</pre>
+</p>
+
+<p>When you <code>STRDBG</code> this program, make sure you put a breakpoint after the comment says:
+<pre>
+> EVAL Pointy
+POINTY = SPP:D9858621D4002540
+
+> EVAL Pointy:c 20
+POINTY:c 20 = 'Hello WorksOfBarry b'
+//This shows the next 20 bytes from the pointer 
+//(:c for characters, 20 for length)
+</pre>
+</p>
+
+<h3>%Alloc and Dealloc</h3>
+<p>I've found that some people find memory allocation can be really confusing, but personally I find it very simple.</p>
+
+<p>Just some things to remember:
+<ul>
+  <li>When you allocate space, it will allocate within a heap inside of the program's activation group.</li>
+  <li>You are able to pass pointers to programs which run in different activation groups to access heaps in different activation groups.</li>
+  <li>If you forget to deallocate memory, all memory within the activation group is deallocated when it ends.</p>
+</ul>
+
+<p><code>%Alloc</code> takes one parameter, which is a numeric length. I have found that if you're using alloc to work with strings, you should add one to your length. This is to support the null terminator.</p>
+
+<p>Let's take my name for example, which is "Liam Allan". That's 10 characters, including the space, which is 10 bytes - but we need to have an extra byte for the null terminator.</p>
+
+<img src="http://i.imgur.com/4tgPmGY.png">
+
+<p>Deallocating is very important. The <code>dealloc</code> operation allows you to deallocate the memory you have allocated and has two extenders:
+<ul>
+  <li><code>E</code> for error. If this extender is used, <code>dealloc</code> will never crash and will instead update the value of <code>%Error</code>.</li>
+  <li><code>N</code> for <code>*Null</code>. This means that when the memory is deallocated, it will set the pointer back to <code>*null</code>.</li>
+</ul>
+I like to use both!</p>
+
+<p>
+Here's a working example:
+<pre>
+<a name="line5"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> Pointy </font><font color="#800000">Pointer</font> <font color="#800000">Inz</font><font color="#800080">(</font><font color="#808000">*Null</font><font color="#800080">);</font>
+<a name="line6"></a>
+<a name="line7"></a><font color="#000000">Pointy </font><font color="#800080">=</font> <font color="#0000ff">%Alloc</font><font color="#800080">(</font><font color="#0000ff">11</font><font color="#800080">);</font>
+<a name="line8"></a>
+<a name="line9"></a><font color="#ff0000">Dealloc</font><font color="#800080">(</font><font color="#ff0000">ne</font><font color="#800080">)</font><font color="#000000"> Pointy</font><font color="#800080">;</font>
+</pre>
+</p>
+
+<h3>%Str</h3>
+<p>Great! So now we know how to create space, how do we use this space? With <code>%Str</code> of course! <code>%Str</code> has two uses - to make this simple, it can be used as a getter and setter.</p>
+
+<h4>Setter</h4>
+<p>The setter should take a second value, which is the length you're assigning - it does not have to match the length, it's just preference for me. Just know that the last character will always be the null terminator.
+<pre>
+<a name="line5"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> Pointy </font><font color="#800000">Pointer</font> <font color="#800000">Inz</font><font color="#800080">(</font><font color="#808000">*Null</font><font color="#800080">);</font>
+<a name="line6"></a>
+<a name="line7"></a><font color="#000000">Pointy </font><font color="#800080">=</font> <font color="#0000ff">%Alloc</font><font color="#800080">(</font><font color="#0000ff">11</font><font color="#800080">);</font>
+<a name="line8"></a>
+<a name="line9"></a><font color="#0000ff">%Str</font><font color="#800080">(</font><font color="#000000">Pointy</font><font color="#800080">:</font><font color="#0000ff">10</font>+</font><font color="#0000ff">1</font><font color="#800080">)</font> <font color="#800080">=</font> <font color="#008000">'Liam Allan'</font><font color="#800080">;</font>
+<a name="line7"></a><font color="#008080">//Notice the +1 for null-terminator</font>
+<a name="line10"></a>
+<a name="line11"></a><font color="#ff0000">Dealloc</font><font color="#800080">(</font><font color="#ff0000">ne</font><font color="#800080">)</font><font color="#000000"> Pointy</font><font color="#800080">;</font>
+</pre>
+</p>
+
+<h4>Getter</h4>
+<p>Getting the value out is nice and simple. One thing to remember is that %Str will get all characters at the pointer up until the null-terminator.</p>
+
+<img src="http://i.imgur.com/rEbmlVM.png">
+
+<p>You can also pass in a second parameter, which is the length to get - in this example I will use length of the text I assigned when printing with <code>Dsply</code>.
+<pre>
+<a name="line5"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> Name   </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">);</font>
+<a name="line6"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> Pointy </font><font color="#800000">Pointer</font> <font color="#800000">Inz</font><font color="#800080">(</font><font color="#808000">*Null</font><font color="#800080">);</font>
+<a name="line7"></a>
+<a name="line8"></a><font color="#008080">//Allocate and assign</font>
+<a name="line9"></a><font color="#000000">Pointy </font><font color="#800080">=</font> <font color="#0000ff">%Alloc</font><font color="#800080">(</font><font color="#0000ff">11</font><font color="#800080">);</font>
+<a name="line10"></a><font color="#0000ff">%Str</font><font color="#800080">(</font><font color="#000000">Pointy</font><font color="#800080">:</font><font color="#0000ff">%Len</font><font color="#800080">(</font><font color="#000000">Name</font><font color="#800080">)+</font><font color="#0000ff">1</font><font color="#800080">)</font> <font color="#800080">=</font> <font color="#008000">'Liam Allan'</font><font color="#800080">;</font>
+<a name="line11"></a>
+<a name="line12"></a><font color="#008080">//Give Name field a value</font>
+<a name="line13"></a><font color="#000000">Name </font><font color="#800080">=</font> <font color="#008000">'Liam Allan'</font><font color="#800080">;</font>
+<a name="line14"></a>
+<a name="line15"></a><font color="#800080">If</font> <font color="#800080">(</font><font color="#0000ff">%Str</font><font color="#800080">(</font><font color="#000000">Pointy</font><font color="#800080">)</font> <font color="#800080">=</font><font color="#000000"> Name</font><font color="#800080">);</font>
+<a name="line16"></a>  <font color="#ff0000">DSPLY</font> <font color="#0000ff">%Str</font><font color="#800080">(</font><font color="#000000">Pointy</font><font color="#800080">:</font><font color="#0000ff">10</font><font color="#800080">);</font>
+<a name="line17"></a><font color="#800080">ENDIF;</font>
+<a name="line18"></a>
+<a name="line19"></a><font color="#ff0000">Dealloc</font><font color="#800080">(</font><font color="#ff0000">ne</font><font color="#800080">)</font><font color="#000000"> Pointy</font><font color="#800080">;</font>
+</pre>
+</p>
+
+<h3>End</h3>
+<p>Well I hope this was a somewhat interesting guide into null-terminator strings and pointers. I actually had fun writing it!</p>

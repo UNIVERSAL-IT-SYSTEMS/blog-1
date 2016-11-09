@@ -1,0 +1,159 @@
+<p>In today's blog, we're going to talk about stored procedures to call ILE programs from SQL. I've been inspired to write this blog because of an article: <a href="http://www.ibmsystemsmag.com/ibmi/developer/rpg/rpg_stored_procedures/?page=1">Recycling RPG as Stored Procedures</a>, which was written by Susan Gantner and Jon Paris. Although fairly old, it's still a great article.</p>
+
+<p>This article is based on IBM i 7.2. The plan is to go over creating the program, creating the SQL procedure and then also creating a Node.js script to call that procedure.</p>
+
+<h3>Creating the RPG Program</h3>
+<p>I use RPG by pure example. You could use any ILE language, even Java. Also, <code>pCusAge</code> could be <code>Int(3)</code> instead.</p>
+<pre>
+<a name="line1"></a><font color="#008000">**FREE</font>
+<a name="line2"></a>
+<a name="line3"></a><font color="#ff0000">Ctl-Opt</font> <font color="#800000">DftActGrp</font><font color="#800080">(</font><font color="#808000">*No</font><font color="#800080">)</font> <font color="#800000">ActGrp</font><font color="#800080">(</font><font color="#808000">*New</font><font color="#800080">);</font>
+<a name="line4"></a>
+<a name="line5"></a><font color="#ff0000">Dcl-Pi</font><font color="#000000"> Program</font><font color="#800080">;</font>
+<a name="line6"></a><font color="#000000">  pCusID    </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">);</font>
+<a name="line7"></a><font color="#000000">  pCusName  </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">20</font><font color="#800080">);</font>
+<a name="line8"></a><font color="#000000">  pCusEmail </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">25</font><font color="#800080">);</font>
+<a name="line9"></a><font color="#000000">  pCusAge   </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">);</font>
+<a name="line10"></a><font color="#ff0000">END-PI</font><font color="#800080">;</font>
+<a name="line11"></a>
+<a name="line12"></a><font color="#800080">Select;</font>
+<a name="line13"></a>  <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">pCusID </font><font color="#800080">=</font> <font color="#0000ff">1</font><font color="#800080">);</font>
+<a name="line14"></a><font color="#000000">    pCusName  </font><font color="#800080">=</font> <font color="#008000">'Barry'</font><font color="#800080">;</font>
+<a name="line15"></a><font color="#000000">    pCusEmail </font><font color="#800080">=</font> <font color="#008000">'worksofbarry@me.com'</font><font color="#800080">;</font>
+<a name="line16"></a><font color="#000000">    pCusAge   </font><font color="#800080">=</font> <font color="#0000ff">19</font><font color="#800080">;</font>
+<a name="line17"></a>
+<a name="line18"></a>  <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">pCusID </font><font color="#800080">=</font> <font color="#0000ff">2</font><font color="#800080">);</font>
+<a name="line19"></a><font color="#000000">    pcusName  </font><font color="#800080">=</font> <font color="#008000">'MillyMai'</font><font color="#800080">;</font>
+<a name="line20"></a><font color="#000000">    pCusEmail </font><font color="#800080">=</font> <font color="#008000">'MillyMai15@me.com'</font><font color="#800080">;</font>
+<a name="line21"></a><font color="#000000">    pCusAge   </font><font color="#800080">=</font> <font color="#0000ff">19</font><font color="#800080">;</font>
+<a name="line22"></a>
+<a name="line23"></a>  <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">pCusID </font><font color="#800080">=</font> <font color="#0000ff">3</font><font color="#800080">);</font>
+<a name="line24"></a><font color="#000000">    pcusName  </font><font color="#800080">=</font> <font color="#008000">'DarthJim'</font><font color="#800080">;</font>
+<a name="line25"></a><font color="#000000">    pCusEmail </font><font color="#800080">=</font> <font color="#008000">'Darth.Jim@me.com'</font><font color="#800080">;</font>
+<a name="line26"></a><font color="#000000">    pCusAge   </font><font color="#800080">=</font> <font color="#0000ff">41</font><font color="#800080">;</font>
+<a name="line27"></a>
+<a name="line28"></a>  <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">pCusID </font><font color="#800080">=</font> <font color="#0000ff">4</font><font color="#800080">);</font>
+<a name="line29"></a><font color="#000000">    pcusName  </font><font color="#800080">=</font> <font color="#008000">'Lizzo'</font><font color="#800080">;</font>
+<a name="line30"></a><font color="#000000">    pCusEmail </font><font color="#800080">=</font> <font color="#008000">'Lizzo.Cool@me.com'</font><font color="#800080">;</font>
+<a name="line31"></a><font color="#000000">    pCusAge   </font><font color="#800080">=</font> <font color="#0000ff">48</font><font color="#800080">;</font>
+<a name="line32"></a><font color="#800080">ENDSL;</font>
+<a name="line33"></a>
+<a name="line34"></a><font color="#000000">*InLR </font><font color="#800080">=</font> <font color="#808000">*On</font><font color="#800080">;</font>
+<a name="line35"></a><font color="#800080">Return;</font>
+</pre>
+<p>Quite simply, you pass in data though the first parameter and the program will pass data out through the other paramaters (by reference). I call this program <code>Program</code> and placed it in my current library, which is <code>#LALLAN</code>. (<code>#LALLAN.PROGRAM</code>)</p>
+
+<h3>Creating the stored procedure</h3>
+<p>I use ACS->Run SQL Scripts to run this SQL statement, but you can probably use <code>STRSQL</code> if you wanted to. The following statement creates a stored procedure named <code>getCusInfo</code> in my <code>#LALLAN</code> library.</p>
+<pre>
+<span style='color:#800000; font-weight:bold; '>CREATE</span> <span style='color:#800000; font-weight:bold; '>OR</span> <span style='color:#800000; font-weight:bold; '>REPLACE</span> <span style='color:#800000; font-weight:bold; '>PROCEDURE</span> <span style='color:#808030; '>#</span>LALLAN<span style='color:#808030; '>.</span>getCusInfo <span style='color:#808030; '>(</span>
+  <span style='color:#800000; font-weight:bold; '>IN</span> CusID <span style='color:#800000; font-weight:bold; '>INTEGER</span><span style='color:#808030; '>,</span> 
+  <span style='color:#800000; font-weight:bold; '>OUT</span> CusName <span style='color:#800000; font-weight:bold; '>CHAR</span> <span style='color:#808030; '>(</span><span style='color:#008c00; '>20</span><span style='color:#808030; '>)</span><span style='color:#808030; '>,</span> 
+  <span style='color:#800000; font-weight:bold; '>OUT</span> CusEmail <span style='color:#800000; font-weight:bold; '>CHAR</span><span style='color:#808030; '>(</span><span style='color:#008c00; '>25</span><span style='color:#808030; '>)</span><span style='color:#808030; '>,</span> 
+  <span style='color:#800000; font-weight:bold; '>OUT</span> pCusAge <span style='color:#800000; font-weight:bold; '>INTEGER</span>
+<span style='color:#808030; '>)</span>
+<span style='color:#800000; font-weight:bold; '>EXTERNAL</span> NAME <span style='color:#808030; '>#</span>LALLAN<span style='color:#808030; '>.</span>PROGRAM
+<span style='color:#800000; font-weight:bold; '>LANGUAGE</span> RPGLE	
+<span style='color:#800000; font-weight:bold; '>PARAMETER</span> STYLE GENERAL
+</pre>
+
+<h3>Using Node.js to call our SQL procedure</h3>
+<p>In this Node.js script, we use prepared statements to pass in data. The data comes out of the <code>executeSync</code> callback function (the first parameter). The script works in this order:
+<ol>
+  <li>Define <code>db</code> which points to the DB2 API for Node.js</li>
+  <li>Create the SQL statement (<code>sql</code>)</li>
+  <li>Create a new DB2 connection instance (<code>dbconn</code>) and then connect to the <code>*LOCAL</code> database</li>
+  <li>Define a prepared statement (<code>stmt</code>)</li>
+  <li>Prepare our SQL statement (<code>sql</code> variable) to our prepare statement instance (<code>stmt</code>) using <code>stmt.prepareSync</code></li>
+  <li>Bind the parameters with <code>stmt.bindParamSync</code></li>
+  <li>Execute the prepared statement with <code>stmt.executeSync</code></li>
+</ol>
+I put the following code into nodeDb2.js in my current directory, but you can call it whatever you like.
+</p>
+
+<pre>
+<span style='color:#800000; font-weight:bold; '>var</span> db <span style='color:#808030; '>=</span> require<span style='color:#808030; '>(</span><span style='color:#800000; '>'</span><span style='color:#0000e6; '>/QOpenSys/QIBM/ProdData/OPS/Node4/os400/db2i/lib/db2a</span><span style='color:#800000; '>'</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>//Create out statement</span>
+<span style='color:#800000; font-weight:bold; '>var</span> sql <span style='color:#808030; '>=</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>call #LALLAN.getCusInfo(?, ?, ?, ?)</span><span style='color:#800000; '>"</span><span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>//Prepare our connection</span>
+<span style='color:#800000; font-weight:bold; '>var</span> dbconn <span style='color:#808030; '>=</span> <span style='color:#800000; font-weight:bold; '>new</span> db<span style='color:#808030; '>.</span>dbconn<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+dbconn<span style='color:#808030; '>.</span>conn<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>*LOCAL</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>//Create out prepared statement</span>
+<span style='color:#800000; font-weight:bold; '>var</span> stmt <span style='color:#808030; '>=</span> <span style='color:#800000; font-weight:bold; '>new</span> db<span style='color:#808030; '>.</span>dbstmt<span style='color:#808030; '>(</span>dbconn<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>//Our customer object/array</span>
+<span style='color:#800000; font-weight:bold; '>var</span> Customer  <span style='color:#808030; '>=</span> <span style='color:#808030; '>[</span><span style='color:#808030; '>]</span><span style='color:#800080; '>;</span>
+Customer<span style='color:#808030; '>.</span>ID   <span style='color:#808030; '>=</span> <span style='color:#008c00; '>1</span><span style='color:#800080; '>;</span>
+Customer<span style='color:#808030; '>.</span>Data <span style='color:#808030; '>=</span> <span style='color:#808030; '>[</span><span style='color:#808030; '>]</span><span style='color:#800080; '>;</span>
+
+stmt<span style='color:#808030; '>.</span>prepareSync<span style='color:#808030; '>(</span>sql<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+stmt<span style='color:#808030; '>.</span>bindParamSync<span style='color:#808030; '>(</span><span style='color:#808030; '>[</span>
+      <span style='color:#808030; '>[</span>Customer<span style='color:#808030; '>.</span>ID<span style='color:#808030; '>,</span> db<span style='color:#808030; '>.</span>SQL_PARAM_INPUT<span style='color:#808030; '>,</span> <span style='color:#008c00; '>2</span><span style='color:#808030; '>]</span><span style='color:#808030; '>,</span>
+      <span style='color:#808030; '>[</span><span style='color:#800000; '>'</span><span style='color:#800000; '>'</span><span style='color:#808030; '>,</span> db<span style='color:#808030; '>.</span>SQL_PARAM_OUTPUT<span style='color:#808030; '>,</span> <span style='color:#008c00; '>1</span><span style='color:#808030; '>]</span><span style='color:#808030; '>,</span>
+      <span style='color:#808030; '>[</span><span style='color:#800000; '>'</span><span style='color:#800000; '>'</span><span style='color:#808030; '>,</span> db<span style='color:#808030; '>.</span>SQL_PARAM_OUTPUT<span style='color:#808030; '>,</span> <span style='color:#008c00; '>1</span><span style='color:#808030; '>]</span><span style='color:#808030; '>,</span>
+      <span style='color:#808030; '>[</span><span style='color:#008c00; '>0</span><span style='color:#808030; '>,</span> db<span style='color:#808030; '>.</span>SQL_PARAM_OUTPUT<span style='color:#808030; '>,</span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>]</span>
+<span style='color:#808030; '>]</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+stmt<span style='color:#808030; '>.</span>executeSync<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>function</span> callback<span style='color:#808030; '>(</span>out<span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span> 
+	Customer<span style='color:#808030; '>.</span>Data <span style='color:#808030; '>=</span> out<span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+console<span style='color:#808030; '>.</span><span style='color:#800000; font-weight:bold; '>log</span><span style='color:#808030; '>(</span>Customer<span style='color:#808030; '>.</span>Data<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>//</span>
+<span style='color:#800000; font-weight:bold; '>delete</span> stmt<span style='color:#800080; '>;</span>
+dbconn<span style='color:#808030; '>.</span>disconn<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+<span style='color:#800000; font-weight:bold; '>delete</span> dbconn<span style='color:#800080; '>;</span>
+</pre>
+
+<h3>Testing the process</h3>
+<p>I've stopped using QSH and have started using SSH to log into my system when using Node.js. I call the script with <code>node nodeDb2.js</code> and my output is a little something like this:</p>
+<pre>
+C:\Users\Barry\Documents\GitHub> ssh barry@swagibmi
+-bash-4.2$ node nodeDb2.js
+[ 'Barry               ', 'worksofbarry@me.com      ', '19  ' ]
+</pre>
+<p>If I was to change my <code>Customer.ID</code> in my Node.js script to 2, 3 or 4, the output would have been something else.</p>
+
+<br><br>
+<h3>Extra: Calling the SQL procedure from PHP!</h3>
+<p>Thanks to <a href="https://twitter.com/php_dave">@phpdave</a> (<a href="https://godzillai5.wordpress.com/">godzillai5.wordpress.com</a>) for writing this script. This script will function the same as the Node.js one would - processes the statement, but instead puts the data back into the <code>$Customer</code> class.</p>
+
+<pre>
+<span style='color:#5f5035; '>&lt;?php</span><span style='color:#000000; '></span>
+<span style='color:#696969; '>//Create db connection</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$hostname</span><span style='color:#000000; '> </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#0000e6; '>"MYIBMI"</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$user</span><span style='color:#000000; '> </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#0000e6; '>"MYPROFILE"</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$password</span><span style='color:#000000; '> </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#0000e6; '>""</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$dbconn</span><span style='color:#000000; '> </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#800000; font-weight:bold; '>new</span><span style='color:#000000; '> </span><span style='color:#bb7977; font-weight:bold; '>PDO</span><span style='color:#808030; '>(</span><span style='color:#0000e6; '>"odbc:"</span><span style='color:#000000; '> </span><span style='color:#808030; '>.</span><span style='color:#000000; '> </span><span style='color:#797997; '>$hostname</span><span style='color:#808030; '>,</span><span style='color:#000000; '> </span><span style='color:#797997; '>$user</span><span style='color:#808030; '>,</span><span style='color:#000000; '> </span><span style='color:#797997; '>$password</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#000000; '></span>
+<span style='color:#696969; '>//SQL to run stored proc</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$sql</span><span style='color:#000000; '> </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#0000e6; '>"call #LALLAN.getCusInfo(?, ?, ?, ?)"</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#000000; '></span>
+<span style='color:#696969; '>//Prepare SQL for execution</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$stmt</span><span style='color:#000000; '> </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#797997; '>$dbconn</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#400000; '>prepare</span><span style='color:#808030; '>(</span><span style='color:#797997; '>$sql</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#000000; '></span>
+<span style='color:#696969; '>//Create a test object for demo purposes</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$Customer</span><span style='color:#000000; '>  </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#800000; font-weight:bold; '>new</span><span style='color:#000000; '> stdClass</span><span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$Customer</span><span style='color:#808030; '>-></span><span style='color:#797997; '>ID</span><span style='color:#000000; '>   </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#008c00; '>1</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$Customer</span><span style='color:#808030; '>-></span><span style='color:#797997; '>Data1</span><span style='color:#000000; '>   </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#0000e6; '>""</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$Customer</span><span style='color:#808030; '>-></span><span style='color:#797997; '>Data2</span><span style='color:#000000; '>   </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#0000e6; '>""</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$Customer</span><span style='color:#808030; '>-></span><span style='color:#797997; '>Data3</span><span style='color:#000000; '>   </span><span style='color:#808030; '>=</span><span style='color:#000000; '> </span><span style='color:#008c00; '>1</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#000000; '></span>
+<span style='color:#696969; '>//Bind object properties to our object</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$stmt</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#400000; '>bindParam</span><span style='color:#808030; '>(</span><span style='color:#008c00; '>1</span><span style='color:#808030; '>,</span><span style='color:#000000; '> </span><span style='color:#797997; '>$Customer</span><span style='color:#808030; '>-></span><span style='color:#797997; '>ID</span><span style='color:#808030; '>,</span><span style='color:#000000; '> </span><span style='color:#bb7977; font-weight:bold; '>PDO</span><span style='color:#800080; '>:</span><span style='color:#800080; '>:</span><span style='color:#7d0045; '>PARAM_INT</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$stmt</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#400000; '>bindParam</span><span style='color:#808030; '>(</span><span style='color:#008c00; '>2</span><span style='color:#808030; '>,</span><span style='color:#000000; '> </span><span style='color:#797997; '>$Customer</span><span style='color:#808030; '>-></span><span style='color:#797997; '>Data1</span><span style='color:#808030; '>,</span><span style='color:#000000; '> </span><span style='color:#bb7977; font-weight:bold; '>PDO</span><span style='color:#800080; '>:</span><span style='color:#800080; '>:</span><span style='color:#7d0045; '>PARAM_INPUT_OUTPUT</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$stmt</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#400000; '>bindParam</span><span style='color:#808030; '>(</span><span style='color:#008c00; '>3</span><span style='color:#808030; '>,</span><span style='color:#000000; '> </span><span style='color:#797997; '>$Customer</span><span style='color:#808030; '>-></span><span style='color:#797997; '>Data2</span><span style='color:#808030; '>,</span><span style='color:#000000; '> </span><span style='color:#bb7977; font-weight:bold; '>PDO</span><span style='color:#800080; '>:</span><span style='color:#800080; '>:</span><span style='color:#7d0045; '>PARAM_INPUT_OUTPUT</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$stmt</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#400000; '>bindParam</span><span style='color:#808030; '>(</span><span style='color:#008c00; '>4</span><span style='color:#808030; '>,</span><span style='color:#000000; '> </span><span style='color:#797997; '>$Customer</span><span style='color:#808030; '>-></span><span style='color:#797997; '>Data3</span><span style='color:#808030; '>,</span><span style='color:#000000; '> </span><span style='color:#bb7977; font-weight:bold; '>PDO</span><span style='color:#800080; '>:</span><span style='color:#800080; '>:</span><span style='color:#7d0045; '>PARAM_INPUT_OUTPUT</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#000000; '></span>
+<span style='color:#696969; '>//Run it</span><span style='color:#000000; '></span>
+<span style='color:#797997; '>$stmt</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#400000; '>execute</span><span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#000000; '></span>
+<span style='color:#696969; '>//Dump our object to the screen to see what everything got set to.</span>
+<span style='color:#696969; '>//Or alternatively run xdebug or another debugger to view the</span>
+<span style='color:#696969; '>//$Customer object after execution</span>
+<span style='color:#400000; '>var_dump</span><span style='color:#808030; '>(</span><span style='color:#797997; '>$Customer</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span><span style='color:#000000; '></span>
+<span style='color:#5f5035; '>?></span>
+</pre>

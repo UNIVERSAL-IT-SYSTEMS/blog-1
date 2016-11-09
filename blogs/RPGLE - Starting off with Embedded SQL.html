@@ -1,0 +1,167 @@
+<p>I love Embedded SQL in RPG, it's my favourite feature and it couldn't be any better really (well it could, but this isn't a rant). This long blog post is actually going to be more of a guide.</p>
+
+<p>Embedded SQL is going to make your code cleaner, and also process more workload in less lines of code. No more Dcl-F.. Embedded SQL is here to replace it.</p>
+
+<p>I'd like to note, Embedded SQL should not be used to modernize code. If you have business logic using delcared files, do not remove it. Embedded SQL should be used to write new logic in new software.</p>
+
+<h3>How does Embedded SQL work?</h3>
+<p>Interesting topic, this. I like how it works because I have an interest in compilers, others may find it boring - but it's interesting to know.</p>
+
+<p>Embedded SQL takes your source member, scans it for the <code>EXEC SQL</code> operation(?) and replaces it with fixed format RPG (sigh) program calls. I/some call this step the 'pre-compile' - it's what the pre-compiler does. The pre-compiler also declares a load of variables for your use in programs, like <code>SQLSTATE</code> for example.</p>
+
+<p>I use <code>SQLSTATE</code> to check if there are any data errors or SQL errors. SQLSTATE is a character five field, and you can <a href="http://publib.boulder.ibm.com/html/as400/v4r5/ic2979/info/db2/rbafymstretcode.htm">find what the data means here</a>.
+
+<p><img src="http://i.imgur.com/OmCPkD6.png"></p>
+
+<h3>How do I start using it?</h3>
+<p>The first step is to ditch <code>CRTBNDRPG</code> and <code>CRTRPGMOD</code>. They are now useless in my mind, as you can use <code>CRTSQLRPGI</code> as a replacement for both of these. Also, start using <code>SQLRPGLE</code> as the extention for all your RPG code.</p>
+
+<p>To create a regular program, you use <code>CRTSQLRPGI</code> with <code>OBJTYPE(*PGM)</code> as a parameter; for a module you use <code>OBJTYPE(*MODULE)</code>. This is just my opinion though, of course you can still use the other commands, but you can still compile regular RPG with this command.</p>
+
+<p>For this post, I'm gonna use this SQL to create a new physical file/table. Now, as naughty as I am: I did use STRSQL to create this table. I typed <code>create table</code> and used F4 to prompt the rest of the data in. <code>LIAMALLAN1</code> is the library I made the PF in, but it's optional of course.</p>
+
+<p><pre>
+CREATE TABLE LIAMALLAN1/CUSTOMERS (
+	CUS_ID INT NOT NULL WITH DEFAULT, 
+	CUS_BAL NUMERIC (11 , 2) NOT NULL WITH DEFAULT, 
+	CUS_NAME CHAR (25) NOT NULL WITH DEFAULT, 
+	CUS_EMAIL CHAR (50) NOT NULL WITH DEFAULT
+)                                                    
+</pre></p>
+
+<p>This is not an SQL tutorial, but we do want data in the file. You can optionally use <code>UPDDTA</code> against the PF with insert mode to add data - or you can use SQL <code>INSERT</code>. Note that these are all seperate statements.</p>
+
+<p><pre>
+INSERT INTO LIAMALLAN1/CUSTOMERS VALUES(
+	1, 
+	10.25, 
+	'Liam Barry',
+	'mrliamallan@live.co.uk'
+)
+
+INSERT INTO LIAMALLAN1/CUSTOMERS VALUES(
+	2, 
+	100.66, 
+	'Eric Jooka',
+	'ericjooka@person.com'
+)
+
+INSERT INTO LIAMALLAN1/CUSTOMERS VALUES(
+	3, 
+	1123124.12, 
+	'Emily Bae',
+	'emilybae@hello.com'
+)
+</pre></p>
+
+<h3>How do I really start using it?</h3>
+<p>Now we have some data, we can really start using Embedded SQL. So, make sure you have a test source member/steamfile to put your Embedded SQL in. Embedded SQL allows any regular DB2 statement within your source, be it <code>DELETE</code>, </code>UPDATE</code>, <code>INSERT</code> or <code>SELECT</code>.</p>
+
+<p>As <code>SELECT</code> may be the most important one for beginners, we'll look at that first. As good practice, for every PF I use within Embedded SQL, I like to declare a data-structure (Dcl-DS) matching the PF fields. I also make it a template, incase I want to use it in multiple places.</p>
+
+<p><pre>
+<a name="line9"></a><font color="#008080">//Template data structure matching CUSTOMERS file</font>
+<a name="line10"></a><font color="#ff0000">Dcl-DS</font><font color="#000000"> CUSTOMER_Temp </font><font color="#800000">Qualified</font> <font color="#800000">Template</font><font color="#800080">;</font>
+<a name="line11"></a><font color="#000000">  CUS_ID    </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">);</font>
+<a name="line12"></a><font color="#000000">  CUS_BAL   </font><font color="#800000">Packed</font><font color="#800080">(</font><font color="#0000ff">11</font><font color="#800080">:</font><font color="#0000ff">2</font><font color="#800080">);</font>
+<a name="line13"></a><font color="#000000">  CUS_NAME  </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">25</font><font color="#800080">);</font>
+<a name="line14"></a><font color="#000000">  CUS_EMAIL </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">50</font><font color="#800080">);</font>
+<a name="line15"></a><font color="#ff0000">End-Ds</font><font color="#800080">;</font>
+<a name="line16"></a>
+<a name="line17"></a><font color="#ff0000">Dcl-DS</font><font color="#000000"> CUSTOMER </font><font color="#800000">LikeDS</font><font color="#800080">(</font><font color="#000000">CUSTOMER_Temp</font><font color="#800080">);</font>
+</pre></p>
+
+<p>Selecting one record from the file is a simple start, and useful if you're writing something like a maintainance screen.</p>
+
+<p><pre>
+<a name="line19"></a><font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">SELECT</font><font color="#000000"> CUS_BAL,</font>
+<a name="line20"></a><font color="#000000">                CUS_NAME</font>
+<a name="line21"></a>         <font color="#0000ff">INTO</font><font color="#000000">   :Customer.CUS_BAL,</font>
+<a name="line22"></a><font color="#000000">                :Customer.CUS_NAME</font>
+<a name="line23"></a>         <font color="#0000ff">FROM</font><font color="#000000">   CUSTOMERS</font>
+<a name="line24"></a>         <font color="#0000ff">WHERE</font><font color="#000000">  CUS_ID = 1;</font>
+</pre></p>
+
+<p><img src="http://i.imgur.com/f8b6nAV.png"></p>
+
+<p>And as you can see, it's simple to get data - very easy. What if we update data on our maintainance screen? The next snippet of code sits below the previous <code>SELECT</code> statement that we created in our RPG.</p>
+
+<p><pre>
+<a name="line30"></a><font color="#008080">//Imagine this is the change on our screen</font>
+<a name="line31"></a><font color="#000000">Customer</font><font color="#800080">.</font><font color="#000000">CUS_NAME </font><font color="#800080">=</font> <font color="#008000">'Barry James'</font><font color="#800080">;</font>
+<a name="line32"></a>
+<a name="line33"></a><font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">UPDATE</font><font color="#000000"> CUSTOMERS </font><font color="#0000ff">SET</font>
+<a name="line34"></a><font color="#000000">           CUS_BAL  = :Customer.CUS_BAL,</font>
+<a name="line35"></a><font color="#000000">           CUS_NAME = :Customer.CUS_NAME</font>
+<a name="line36"></a>         <font color="#0000ff">WHERE</font><font color="#000000"> CUS_ID = 1;</font>
+</pre></p>
+
+<p>After we have compiled and ran this program, open <code>STRSQL</code> and <code>SELECT * FROM CUSTOMERS</code>..</p>
+
+<p><img src="http://i.imgur.com/Setqhzh.png"></p>
+
+<h3>Lots of data</h3>
+<p>It's a need to <code>SELECT</code> more than one row at a time, luckily you can do this with cursors. Note, when using cursors: make sure you <b>close</b> the cursor when you've finished using it - you're causing yourself problems if you don't do this. Luckily, we declared our CUSTOMER data-structure so we can re-use it in our do-while.</p>
+
+<p>You delcare your cursor with your <code>SELECT</code> statement. The syntax is a bit like <code>EXEC SQL DECLARE [cursor-name] CURSOR FOR [select-statement]</code>.</p>
+
+<p><pre>
+<a name="line40"></a><font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">Declare</font><font color="#000000"> Cust_Cur </font><font color="#0000ff">Cursor</font> <font color="#0000ff">FOR</font>
+<a name="line41"></a>  <font color="#0000ff">SELECT</font><font color="#000000"> *</font>
+<a name="line42"></a>  <font color="#0000ff">FROM</font><font color="#000000">   CUSTOMERS;</font>
+</pre></p>
+
+<p>Even after we've closed the cursor, we are able to re-open it again - but not while it's already open. I've commented on the code instead of seperating it into blocks.</p>
+
+<p><pre>
+<a name="line40"></a><font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">Declare</font><font color="#000000"> Cust_Cur </font><font color="#0000ff">Cursor</font> <font color="#0000ff">FOR</font>
+<a name="line41"></a>  <font color="#0000ff">SELECT</font><font color="#000000"> *</font>
+<a name="line42"></a>  <font color="#0000ff">FROM</font><font color="#000000">   CUSTOMERS;</font>
+<a name="line43"></a>
+<a name="line44"></a><font color="#008080">//Open our cursor that we defined previously.</font>
+<a name="line45"></a><font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">Open</font><font color="#000000"> Cust_Cur;</font>
+<a name="line46"></a>
+<a name="line47"></a><font color="#008080">//'00000' = Unqualified Successful Completion</font>
+<a name="line48"></a><font color="#800080">If</font> <font color="#800080">(</font><font color="#000000">SQLSTATE </font><font color="#800080">=</font> <font color="#008000">'00000'</font><font color="#800080">);</font>
+<a name="line49"></a>
+<a name="line50"></a>  <font color="#008080">//Attemping to get the first record from</font>
+<a name="line51"></a>  <font color="#008080">//CUSTOMERS into our CUSTOMER data structure.</font>
+<a name="line52"></a>  <font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">Fetch</font><font color="#000000"> Cust_Cur </font><font color="#0000ff">Into</font><font color="#000000"> :CUSTOMER;</font>
+<a name="line53"></a>
+<a name="line54"></a>  <font color="#008080">//'00000' = Unqualified Successful Completion</font>
+<a name="line55"></a>  <font color="#800080">Dow</font> <font color="#800080">(</font><font color="#000000">SQLSTATE </font><font color="#800080">=</font> <font color="#008000">'00000'</font><font color="#800080">);</font>
+<a name="line56"></a>    <font color="#008080">//Print some data</font>
+<a name="line57"></a><font color="#000000">    printf</font><font color="#800080">(</font><font color="#0000ff">%Trim</font><font color="#800080">(</font><font color="#000000">Customer</font><font color="#800080">.</font><font color="#000000">CUS_NAME</font><font color="#800080">)</font> <font color="#800080">+</font> <font color="#008000">': '</font> <font color="#800080">+</font> <font color="#0000ff">%Char</font><font color="#800080">(</font><font color="#000000">Customer</font><font color="#800080">.</font><font color="#000000">CUS_BAL</font><font color="#800080">)</font> <font color="#800080">+</font> <font color="#008000">x'25'</font><font color="#800080">);</font>
+<a name="line58"></a>
+<a name="line59"></a>     <font color="#008080">//Fetch the next record</font>
+<a name="line60"></a>    <font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">Fetch</font><font color="#000000"> Cust_Cur </font><font color="#0000ff">Into</font><font color="#000000"> :CUSTOMER;</font>
+<a name="line61"></a>  <font color="#800080">ENDDO;</font>
+<a name="line62"></a>
+<a name="line63"></a><font color="#800080">ENDIF;</font>
+<a name="line64"></a>
+<a name="line65"></a><font color="#008080">//Close the cursor.. WE MUST CLOSE THE CURSOR</font>
+<a name="line66"></a><font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">Close</font><font color="#000000"> Cust_Cur;</font>
+</pre></p>
+
+<p>This code will loop through each record in the CUSTOMERS file and print some relevant data out. It looks something like this..</p>
+
+<p><img src="http://i.imgur.com/B0PyBx0.png"></p>
+
+<h3>Deleting data</h3>
+
+<p>There is still a lot of cursors I haven't covered.. but this is a good start. The last part I will cover is deleting data from the CUSTOMERS file. It's simple, like all over Embedded SQL statements <code>EXEC SQL [statement]</code>. There are two ways I'm going to show. The first is a hardcoded CUS_ID, the second is using Customer.CUS_ID.</p>
+
+<p>
+<pre>
+<a name="line70"></a><font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">DELETE</font> <font color="#0000ff">FROM</font><font color="#000000"> CUSTOMERS</font>
+<a name="line71"></a>         <font color="#0000ff">WHERE</font><font color="#000000"> CUS_ID = 1;</font>
+</pre>
+<pre>
+<a name="line73"></a><font color="#000000">Customer</font><font color="#800080">.</font><font color="#000000">CUS_ID </font><font color="#800080">=</font> <font color="#0000ff">2</font><font color="#800080">;</font>
+<a name="line74"></a><font color="#000080">Exec</font> <font color="#000080">SQL</font> <font color="#0000ff">DELETE</font> <font color="#0000ff">FROM</font><font color="#000000"> CUSTOMERS</font>
+<a name="line75"></a>         <font color="#0000ff">WHERE</font><font color="#000000"> CUS_ID = :Customer.CUS_ID;</font>
+</pre>
+</p>
+
+<p>The ending result would remove two records from the file.</p>
+<p><img src="http://i.imgur.com/VktmscL.png"></p>
