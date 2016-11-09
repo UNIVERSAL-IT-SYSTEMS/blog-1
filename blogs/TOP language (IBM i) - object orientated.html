@@ -1,0 +1,101 @@
+<p><p>TOP has a new feature which I like to call 'call virtual' - which 'emulate' an object orientated feel in your program - below is the snippet from the documentation. I will be honest, these aren't the best examples - but I couldn't come up with anything better.</p>
+
+<h3>Call virtual</h3>
+<p>There is a very useful feature that may allow your program to act more object orientated. You are able to invoke a function through an object, we call this 'Call virtual' function.
+
+</p><pre>
+callvirt PersonObj-&gt;setName("Barry")
+name = [virt PersonObj-&gt;getName()]
+</pre>
+
+
+<p>
+These 'call virtual' features introduce two new keywords, <code>callvirt</code> and <code>virt</code>. <code>callvirt</code> is used as a statement and <code>virt</code> is used as a keyword in an expression. For example, if you had a setter, you'd use the <code>callvirt</code> because no data would come out of it. If you had a getter, you'd use <code>virt</code> within an expression to get the data out - like in the example above.
+</p>
+
+<p>
+You must declare your 'virtual functions' as regular functions, from there they can be invoked. For example, here's a setter for setName:
+
+</p><pre>
+function setName
+  parameters(Name)
+
+  this-&gt;Name = Name
+
+  return *WORKING
+end
+</pre>
+
+
+<p>
+To reference back to the object you're invoking from, you use the <code>this</code> variable which is defined for you when you invoke the function from a 'virtual call'. You're able to access all object's fields using the <code>this</code> variable.</p>
+
+<p>
+Here's an example of getName (the getter):
+
+</p><pre>
+function getName
+
+  return this-&gt;Name
+
+end
+</pre>
+
+
+<p>
+'Call virtual' should be used to contain object specific business logic. For example, if I had an Account object with two fields of Name and Balance I could create have function called addBalance which might look something like this:
+
+</p><pre>
+function addMoney
+  parameter(Amount)
+  
+  this-&gt;Balance = [dec this-&gt;Balance + Amount]
+end
+</pre>
+
+
+<p>
+If I wanted another function to remove an amount, but not let my balance go under 0.00; it may look something like this:
+
+</p><pre>
+function removeMoney
+  parameter(Amount)
+  
+  this-&gt;Balance = [dec this-&gt;Balance - Amount]
+  
+  if(this-&gt;Balance &lt; 0)
+    this-&gt;Balance = 0
+  end
+end
+</pre>
+
+
+<p>
+If it was a requirement to get double the amount the Customer object would have, with some kind of validation; it would look like this:
+
+</p><pre>
+function getDoubleAmount
+  var doubAmount = [this-&gt;Balance * 2]
+
+  ## with a maximum of 1000
+  if(doubAmount &gt; 1000)
+    doubAmount = 1000
+  end
+
+  return doubAmount
+end
+</pre>
+
+
+<p>
+You could invoke these functions like so:
+
+</p><pre>
+callvirt CustObj-&gt;addMoney(100)
+printf(CustObj-&gt;Balance)
+
+printf(virt CustObj-&gt;getDoubleAmount())
+
+callvirt CustObj-&gt;removeMoney(110)
+printf(CustObj-&gt;Balance)
+</pre></p>

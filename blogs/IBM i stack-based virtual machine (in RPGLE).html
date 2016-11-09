@@ -1,0 +1,51 @@
+<p>Project Alexis is a college project for the last unit on my course - Unit 311, Create a Procedural Program. Creating procedural programs is easy and boring! So I took it to the next step and made a stack based virtual machine in RPGLE on IBMi.</p>
+
+<p>So far, it's a very basic instruction set. It's probably best to explain by showing examples and listing its features.
+<br>
+Features include:
+</p><ul><li>Functions</li>
+	<li>Implicit types</li>
+	<li>Interpreted</li>
+	<li><b>Debugging tools</b></li>
+</ul><p>First off, <b>functions</b>. Everything is inside a function, there are no global variables or anything like that. The two function instructions are STRFUN and ENDFUN - as you can guess, start function and end function.</p>
+
+<p>Next is <b>implicit types</b>. You don't have to worry about type conversion as it will be converted at runtime - everything is stored as Char(72) in the backend. The only thing you need to note is that each type has it's own operations. For example, for adding doubles (decimal numbers) you'd do a DECADD or adding two integers you'd do an INTADD.</p>
+
+<p>It's <b>interpreted</b>, and there's nothing wrong with that.</p>
+
+<p>The best part, it has a <b>debugger</b>. It allows you to step through, set breakpoints.. the lot.</p>
+
+<p>Better start with some examples, with comments:
+</p><pre>
+STRFUN Test
+  .LDVAL Hello world     //Load 'Hello world' onto the stack
+  DUP                    //Duplicate the latest value
+  PRINTF                 //Print the lastest value on the stack
+
+  .LDVAL *BLANK          //Load '' onto the stack
+  CALL  HELLO            //Call a function named HELLO (below), all functions require a parameter.
+
+  .LDVAL 1               //Load '1' onto the stack
+  .LDVAL 5               //Load '5' onto the stack
+  SUBSTR                 //Do a subst
+  PRINTF                 //Print the latest value on the stack
+ENDFUN
+
+STRFUN HELLO
+  .LDVAL Hello there
+  DUP
+  PRINTF
+
+  .LDVAL 1
+  .LDVAL 5
+  SUBSTR
+  .LDVAL 7
+  .LDVAL Liam
+  APPEND
+  PRINTF
+ENDFUN                                       
+</pre>
+
+
+<p>And now, I'll just show a picture of the debugger.. I won't go into too much detail about it since it'll better if I recorded a video for that. It does look snazzy though!
+<br><img src="http://i.imgur.com/b2vf7Mw.png"></p>

@@ -1,0 +1,45 @@
+<p>I think this may be the first time I've hesitated writing a blog post about a project. I'd already made 2(?) videos of the virtual machine and a 20 minute video of the language on top of it - but now a blog post.</p>
+
+<p>For the last 3/4ish weeks I've been writing a virtual machine and a programming language on top of it for IBMi systems. I stopped working on the virtual machine about a week ago and spent my week off work implementing the language on-top of the virtual machine.</p>
+
+<p>It took me 2 days to get the compiler working in a decent state with some fun features. The day that become a working program was my birthday - I spent the rest of the week making fixes and also improving the virtual machine.</p>
+
+<p>
+Language features would include
+</p><ul><li>Variables + arrays</li>
+<li>Objects</li>
+<li>Functions + plently of built-in functions</li>
+<li>Implicit types</li>
+<li>Physical file access</li>
+<li>Easy syntax (sadly not the prettiest)</li>
+</ul><p>I'm going to talk about the two best features: Functions and Objects.
+<br><br>
+Functions are great. It's very simple to delcare function parameters and you do not need to specifiy if the function returns a value or not. It's so dynamic, it makes it so the programmer doesn't have to worry very much.
+</p><pre>
+function displayText
+  parameters(textValue)
+
+  printf(textValue)
+  
+  return textValue
+end
+</pre>
+<br>
+Objects are my all time favourite. An object can contain fields, for example, you could have a person object:
+<pre>
+obj Person
+  Name
+  Age
+end
+</pre>
+<br>
+Then you can write code to create new instances of this person and change it's fields:
+<pre>
+var PersonObj
+PersonObj = new Person
+PersonObj-&gt;Name = "Barry"
+printf(PersonObj-&gt;Name)
+</pre>
+
+
+<p>It's not far into development really, but it's so dynamic that it doesn't take long to implement new features. One problem I am having is naming the language. The only idea I have in mind is 'Top', because the extention I've been giving the source members is 'TOP' (because it sits on-top of the virtual machine).</p>

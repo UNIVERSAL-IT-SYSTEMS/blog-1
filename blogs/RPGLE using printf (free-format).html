@@ -1,0 +1,17 @@
+<p>The printf function in C is very useful when starting to develop new programs. I’m not a big fan of using DSPLY.. and I’ve found something I much prefer! The printf function inside of your RPG programs.</p>
+
+<p>Firstly, we must declare our prototype at the top of our program:
+</p><pre>
+Dcl-Pr printf Int(10) ExtProc('printf');
+  format Pointer Value Options(*String);
+END-PR;   
+</pre>
+<br><p>Then we can use it like so:
+</p><pre>
+printf('testing!!!');
+
+*Inlr = *on;
+Return;  
+</pre>
+
+<p>The result is this, look how pretty it is:<br><img src="http://i.imgur.com/80ZEPFt.png" alt="image"></p>

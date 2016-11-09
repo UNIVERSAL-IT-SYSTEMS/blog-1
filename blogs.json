@@ -43,5 +43,35 @@ var blogs = [
     "id":"1",
     "name":"RPGLE - Starting off with Embedded SQL",
     "file":"RPGLE - Starting off with Embedded SQL.html"
+  },
+  {
+    "id":"0",
+    "name":"COMMON US 16",
+    "file":"COMMON16.html"
+  },
+  {
+    "id":"-1",
+    "name":"TOP language (IBM i) - object orientated?",
+    "file":"TOP language (IBM i) - object orientated.html"
+  },
+  {
+    "id":"-2",
+    "name":"TOP Language for IBM i",
+    "file":"TOP Language for IBM i.html"
+  },
+  {
+    "id":"-3",
+    "name":"IBM i Language implementation",
+    "file":"IBM i Language implementation.html"
+  },
+  {
+    "id":"-4",
+    "name":"IBM i stack-based virtual machine (in RPGLE)",
+    "file":"IBM i stack-based virtual machine (in RPGLE).html"
+  },
+  {
+    "id":"-5",
+    "name":"RPGLE using printf (free-format)",
+    "file":"RPGLE using printf (free-format).html"
   }
 ];

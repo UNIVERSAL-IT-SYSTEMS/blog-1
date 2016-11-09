@@ -1,0 +1,41 @@
+<p>I can confirm that from today, the language is in a very good state. Parser is good, virtual machine is good, lots of features and still lots more to come.</p>
+
+<p>Just this morning I had to re-write a lot of the dynamic SQL functionality just to add the <code>SQL.structureM</code> function - but it was worth it because it allows the language to be more dynamic when using SQL:
+
+</p><pre>
+var cmd
+
+cmd = "DSPOBJD OBJ(PALANGCMP/*ALL) OBJTYPE(*ALL) "
+cmd .= "OUTPUT(*OUTFILE) OUTFILE(QTEMP/STUFFS)"
+
+QCMDEXEC(cmd)
+POP()
+
+SQL.load(QTEMP, STUFFS)
+SQL.structure(QSYS, QADSPOBJ)
+
+if(SQL.open() == 1)
+  while(SQL.read() == 1)
+    printf(SQL.get(ODOBNM))
+  end
+end    
+</pre>
+
+
+<p>Another great thing is that you can now use <code>WEB.</code> functions to send requests+get response and download files now. Here's an exmaple:
+
+</p><pre>
+  var webresp
+
+  WEB.send("https://api.bitcoinaverage.com/ticker/EUR/", 1000)
+
+  printf("Web response length: " . WEB.length())
+  printf("First 100 characters: ")
+  webresp = WEB.get(1, 100)
+  printf(webresp)
+</pre>
+
+In this example, it sends a request off to the URL specified and returns the first 1000 characters. It then prints the length and the first 100 characters of the response. I would post a better example, but it's still a work in progress at the moment.
+
+
+<br><br><p>I'm just trying to say that <b>it's coming along well</b>, and the documentation for it is on always being updated as I may any change at all - and is usually reviewed by someone.</p>
