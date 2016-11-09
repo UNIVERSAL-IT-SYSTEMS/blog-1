@@ -54,7 +54,7 @@
   $('div.blogs').html( blogList );
   
   var gotoBlog = Number(location.search.substr(1));
-  if (Number.isNumeric(gotoBlog)) {
+  if (Number.isInteger(gotoBlog)) {
     if (blogs[gotoBlog] !== undefined) {
       loadBlog(blogs[gotoBlog].file, blogs[gotoBlog].id);
     }
