@@ -1,5 +1,10 @@
 var blogs = [
   {
+    "id":"13",
+    "name":"RPGLE - Base64 encoding and decoding (including UTF-8)",
+    "file":"RPGLE - Base64 encoding and decoding.html",
+  },
+  {
     "id":"12",
     "name":"About",
     "file":"About.html",

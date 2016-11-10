@@ -1,0 +1,42 @@
+<p>Base64 is a wonderful, at times. It can be great for serialization of small binary files, but not large ones. If you're base64 for serialization on binary files and then storing them as text into a database or sending that text in a web request - look into the <a href="http://www.ibm.com/support/knowledgecenter/SSEPEK_10.0.0/intro/src/tpc/db2z_largeobjectdatatypes.html">BLOB type</a> and <a href="https://en.wikipedia.org/wiki/POST_(HTTP)">HTTP POST</a> with upload.</p>
+
+<p>Using Embedded SQL, we are now able to encode and decode into base64 on the fly using <code>SYSTOOLS.BASE64ENCODE</code> and <code>SYSTOOLS.BASE64DECODE</code>. When you use these functions, the host variables you pass in should always be varying length (<code>varchar</code> type). If you use a regular character type, it will also encode all the whitespace at the end of the variable.</p>
+
+<pre>
+<a name="line5"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> VarcharField </font><font color="#800000">Varchar</font><font color="#800080">(</font><font color="#0000ff">256</font><font color="#800080">);</font>
+<a name="line6"></a><font color="#000000">VarcharField </font><font color="#800080">=</font> <font color="#008000">'Hello WorksOfBarry blog!!'</font><font color="#800080">;</font>
+<a name="line7"></a>
+<a name="line8"></a><font color="#000080">EXEC</font> <font color="#000080">SQL</font> <font color="#0000ff">SET</font><font color="#000000"> :VarcharField = SYSTOOLS.BASE64ENCODE(:VarcharField);</font>
+<a name="line9"></a><font color="#000080">EXEC</font> <font color="#000080">SQL</font> <font color="#0000ff">SET</font><font color="#000000"> :VarcharField = SYSTOOLS.BASE64DECODE(:VarcharField);</font>
+</pre>
+
+<p>This will encode the <code>VarcharField</code> variable, and then assign the encoding to it - also the same for decode. Of course, you can change where it assigns to and what it encodes.</p>
+
+<h3>CCSID Support</h3>
+<p>These two functions also support CCSIDs, including 1208 - which is used everywhere on the web, meaning it may prove useful for web services. Usually, when you encode it will look at the CCSID of the variable, and then the job (which comes off the system anyway). RPG gives the ability to change the CCSID of a variable using the <code>CCSID</code> option when defining that variable. Notice below that I am using <code><font color="#808000">*UTF8</font></code>, but you can also use <code>1208</code> - or any CCSID you want. Check out the documentation for the CCSID keyword to see the available constants within this keyword.</p>
+
+<pre>
+<a name="line6"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> UTF8Variable </font><font color="#800000">Varchar</font><font color="#800080">(</font><font color="#0000ff">100</font><font color="#800080">)</font> <font color="#800000">Inz</font><font color="#800080">(</font><font color="#008000">''</font><font color="#800080">)</font> <font color="#800000">CCSID</font><font color="#800080">(</font><font color="#808000">*UTF8</font><font color="#800080">);</font>
+</pre>
+
+<p>So in our example below, we have a normal varying length field which we want to convert to UTF-8 base64. To do that, we need a second variable with a CCSID of UTF-8. When we assign our regular variable to our variable with a certain CCSID, RPG will do the CCSID conversion for us - great! From there, we can simply use <code>SYSTOOLS.BASE64ENCODE</code> against the UTF-8 field to get our UTF-8 base64 encoding.</p>
+
+<pre>
+<a name="line5"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> SomeCharVar </font><font color="#800000">Varchar</font><font color="#800080">(</font><font color="#0000ff">50</font><font color="#800080">);</font>   
+<a name="line6"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> ToBeEncoded </font><font color="#800000">Varchar</font><font color="#800080">(</font><font color="#0000ff">100</font><font color="#800080">)</font> <font color="#800000">Inz</font><font color="#800080">(</font><font color="#008000">''</font><font color="#800080">)</font> <font color="#800000">CCSID</font><font color="#800080">(</font><font color="#0000ff">1208</font><font color="#800080">);</font> 
+<a name="line7"></a> 
+<a name="line8"></a><font color="#000000">SomeCharVar </font><font color="#800080">=</font> <font color="#008000">'hello db2 summit'</font><font color="#800080">;</font> 
+<a name="line9"></a><font color="#000000">ToBeEncoded </font><font color="#800080">=</font><font color="#000000"> SomeCharVar</font><font color="#800080">;</font> <font color="#008080">//Convert it to 1208 </font>
+<a name="line10"></a> 
+<a name="line11"></a><font color="#008080">//Encode based on 1208 </font>
+<a name="line12"></a><font color="#000080">EXEC</font> <font color="#000080">SQL</font> <font color="#0000ff">SET</font><font color="#000000"> :ToBeEncoded = SYSTOOLS.BASE64ENCODE(:ToBeEncoded);</font>
+
+<a name="line11"></a><font color="#008080">//By this point of the program, ToBeEncoded now contains UTF-8 base64.</font>
+</pre>
+
+<p>That's it! You can out more at these links:
+<ul>
+  <li><a href="http://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_udf_base64.html">BASE64ENCODE and BASE64DECODE</a> on DB2 for z/OS - also works on DB2 for i.</li>
+  <li><a href="http://www.ibm.com/support/knowledgecenter/ssw_ibm_i_73/rzasd/dccsid.htm">RPGLE CCSID keyword</a></li>
+</ul>
+</p>
