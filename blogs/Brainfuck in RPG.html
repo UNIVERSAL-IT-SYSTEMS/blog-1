@@ -1,0 +1,77 @@
+<p>So I was totally bored and started writing a Brainfuck interpreter in RPG and believe it or not but it works. It's not even that much code either, which makes it much better!</p>
+
+<p><pre>
+<a name="line30"></a><font color="#000000">gCode        </font><font color="#800080">=</font> <font color="#008000">'++++++++[&gt;++++[&gt;++&gt;+++&gt;+++&gt;+&lt;&lt;&lt;&lt;-]&gt;+&gt;+&gt;-&gt;&gt;+[&lt;]&lt;-]&gt;&gt;.&gt;---.+++++++..+++.&gt;&gt;.&lt;-.&lt;.+++.------.--------.&gt;&gt;+.&gt;++.'</font><font color="#800080">;</font>
+<a name="line31"></a><font color="#000000">gCodeInd     </font><font color="#800080">=</font> <font color="#0000ff">1</font><font color="#800080">;</font>
+<a name="line32"></a><font color="#000000">gCells</font><font color="#800080">.</font><font color="#000000">Index </font><font color="#800080">=</font> <font color="#0000ff">10</font><font color="#800080">;</font>
+<a name="line33"></a>
+<a name="line34"></a><font color="#800080">Dow</font> <font color="#800080">(</font><font color="#000000">gCodeInd </font><font color="#800080">&lt;=</font> <font color="#0000ff">%Len</font><font color="#800080">(</font><font color="#000000">gCode</font><font color="#800080">));</font>
+<a name="line35"></a><font color="#000000">  gCmd </font><font color="#800080">=</font> <font color="#0000ff">%Subst</font><font color="#800080">(</font><font color="#000000">gCode</font><font color="#800080">:</font><font color="#000000">gCodeInd</font><font color="#800080">:</font><font color="#0000ff">1</font><font color="#800080">);</font>
+<a name="line36"></a>  <font color="#800080">Select;</font>
+<a name="line37"></a>    <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">gCmd </font><font color="#800080">=</font> <font color="#008000">'&gt;'</font><font color="#800080">);</font>
+<a name="line38"></a><font color="#000000">      gCells</font><font color="#800080">.</font><font color="#000000">Index </font><font color="#800080">+=</font> <font color="#0000ff">1</font><font color="#800080">;</font>
+<a name="line39"></a>    <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">gCmd </font><font color="#800080">=</font> <font color="#008000">'&lt;'</font><font color="#800080">);</font>
+<a name="line40"></a><font color="#000000">      gCells</font><font color="#800080">.</font><font color="#000000">Index </font><font color="#800080">-=</font> <font color="#0000ff">1</font><font color="#800080">;</font>
+<a name="line41"></a>    <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">gCmd </font><font color="#800080">=</font> <font color="#008000">'+'</font><font color="#800080">);</font>
+<a name="line42"></a><font color="#000000">      gCells</font><font color="#800080">.</font><font color="#000000">Value</font><font color="#800080">(</font><font color="#000000">gCells</font><font color="#800080">.</font><font color="#000000">Index</font><font color="#800080">)</font> <font color="#800080">+=</font> <font color="#0000ff">1</font><font color="#800080">;</font>
+<a name="line43"></a>    <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">gCmd </font><font color="#800080">=</font> <font color="#008000">'-'</font><font color="#800080">);</font>
+<a name="line44"></a><font color="#000000">      gCells</font><font color="#800080">.</font><font color="#000000">Value</font><font color="#800080">(</font><font color="#000000">gCells</font><font color="#800080">.</font><font color="#000000">Index</font><font color="#800080">)</font> <font color="#800080">-=</font> <font color="#0000ff">1</font><font color="#800080">;</font>
+<a name="line45"></a>    <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">gCmd </font><font color="#800080">=</font> <font color="#008000">'['</font><font color="#800080">);</font>
+<a name="line46"></a><font color="#000000">      gLoops</font><font color="#800080">.</font><font color="#000000">Value</font><font color="#800080">(</font><font color="#000000">gLoops</font><font color="#800080">.</font><font color="#000000">Index</font><font color="#800080">)</font> <font color="#800080">=</font><font color="#000000"> gCodeInd</font><font color="#800080">;</font>
+<a name="line47"></a><font color="#000000">      gLoops</font><font color="#800080">.</font><font color="#000000">Index </font><font color="#800080">+=</font> <font color="#0000ff">1</font><font color="#800080">;</font>
+<a name="line48"></a>    <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">gCmd </font><font color="#800080">=</font> <font color="#008000">']'</font><font color="#800080">);</font>
+<a name="line49"></a>      <font color="#800080">If</font> <font color="#800080">(</font><font color="#000000">gCells</font><font color="#800080">.</font><font color="#000000">Value</font><font color="#800080">(</font><font color="#000000">gCells</font><font color="#800080">.</font><font color="#000000">Index</font><font color="#800080">)</font> <font color="#800080">&lt;&gt;</font> <font color="#0000ff">0</font><font color="#800080">);</font>
+<a name="line50"></a><font color="#000000">        gCodeInd </font><font color="#800080">=</font><font color="#000000"> gLoops</font><font color="#800080">.</font><font color="#000000">Value</font><font color="#800080">(</font><font color="#000000">gLoops</font><font color="#800080">.</font><font color="#000000">Index</font><font color="#800080">-</font><font color="#0000ff">1</font><font color="#800080">);</font>
+<a name="line51"></a>      <font color="#800080">Else;</font>
+<a name="line52"></a><font color="#000000">        gLoops</font><font color="#800080">.</font><font color="#000000">Index </font><font color="#800080">-=</font> <font color="#0000ff">1</font><font color="#800080">;</font>
+<a name="line53"></a>      <font color="#800080">ENDIF;</font>
+<a name="line54"></a>    <font color="#800080">When</font> <font color="#800080">(</font><font color="#000000">gCmd </font><font color="#800080">=</font> <font color="#008000">'.'</font><font color="#800080">);</font>
+<a name="line55"></a><font color="#000000">      gAscii </font><font color="#800080">=</font><font color="#000000"> gCells</font><font color="#800080">.</font><font color="#000000">Value</font><font color="#800080">(</font><font color="#000000">gCells</font><font color="#800080">.</font><font color="#000000">Index</font><font color="#800080">);</font>
+<a name="line56"></a>      <font color="#000080">EXEC</font> <font color="#000080">SQL</font> <font color="#0000ff">SET</font><font color="#000000"> :gChar = </font><font color="#804000">CHR</font><font color="#000000">(:gAscii);</font>
+<a name="line57"></a><font color="#000000">      printf</font><font color="#800080">(</font><font color="#000000">gChar</font><font color="#800080">);</font>
+<a name="line58"></a>  <font color="#800080">ENDSL;</font>
+<a name="line59"></a><font color="#000000">  gCodeInd </font><font color="#800080">+=</font> <font color="#0000ff">1</font><font color="#800080">;</font>
+<a name="line60"></a><font color="#800080">ENDDO;</font>
+</pre></p>
+
+<p>That's the processor of Brainfuck in just 20 lines of RPG. The content of <code>gCode</code> is a simple 'Hello world' program written in Brainfuck.
+<pre>++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.</pre></p>
+
+<br>
+
+<p>Brainfuck instruction list
+<table>
+<tr>
+<td><code>&gt;</code></td>
+<td>Increment the data pointer (<code>gCells.Index -= 1</code>)</td>
+</tr>
+<tr>
+<td><code>&lt;</code></td>
+<td>Decrement the data pointer (<code>gCells.Index -= 1</code>)</td>
+</tr>
+<tr>
+<td><code>+</code></td>
+<td>Increment value at data pointer (<code>gCells.Value(gCells.Index) += 1;</code>)</td>
+</tr>
+<tr>
+<td><code>-</code></td>
+<td>Decrement value at data pointer (<code>gCells.Value(gCells.Index) -= 1;</code>)</td>
+</tr>
+<tr>
+<td><code>.</code></td>
+<td>Output data pointers value in ascii. (I used DB2's CHR() function to do this)</td>
+</tr>
+<tr>
+<td><code>[</code></td>
+<td>Begining of a loop. This is not the correct implementation. This will not jump to the closing bracket if the value at the data pointer is <code>0</code>, when really it should.</td>
+</tr>
+<tr>
+<td><code>]</code></td>
+<td>End of a loop. Jump to equivalent opening bracket if value at data pointer is not <code>0</code>.</td>
+</tr>
+</table>
+</p>
+
+<p>I am actually missing an instruction, which is <code>]</code>. This is because there is no simple way to read in a single character within a 5250.</p>
+
+<p>There are still improvements and potentially performance fixes to be made, but I will do it when I'm bored again. You can find this implementation on GitHub: <a href="https://github.com/WorksOfBarry/rpg-brainfuck">https://github.com/WorksOfBarry/rpg-brainfuck</a></p>
