@@ -13,7 +13,7 @@
 
 <p>I define <code>PathFile</code> as a <code>Char(128)</code> because I don't usually have paths that are more than 128 characters long. <code>RtvData</code> should be the longest length of a line that you will find in any stream file that you open. <code>OpenMode</code> requires a bit more knowlegde. There are different 'open codes' for different types of operations - such as reading, appending or overwrite. You can find a list of codes available <a href="http://www.mcpressonline.com/programming/rpg/reading-ifs-files-in-rpg.html">on this MCPress article by Robert Cozzi</a> (about half way down).</p>
 
-<p>Next you will want the four prototypes I use for all my code, which will talk more about later.</p>
+<p>Next you will want the four prototypes I use for all my code, which we will talk more about later.</p>
 <pre>
 <a name="line20"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> OpenFile </font><font color="#800000">pointer</font> <font color="#800000">extproc</font><font color="#800080">(</font><a href="http://www.tutorialspoint.com/c_standard_library/c_function_fopen.htm"><font color="#008000">'_C_IFS_fopen'</font></a><font color="#800080">);</font>
 <a name="line21"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//File name</font>
