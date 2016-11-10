@@ -15,25 +15,25 @@
 
 <p>Next you will want the four prototypes I use for all my code, which will talk more about later.</p>
 <pre>
-<a name="line20"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> OpenFile </font><font color="#800000">pointer</font> <font color="#800000">extproc</font><font color="#800080">(</font><font color="#008000">'_C_IFS_fopen'</font><font color="#800080">);</font>
+<a name="line20"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> OpenFile </font><font color="#800000">pointer</font> <font color="#800000">extproc</font><font color="#800080">(</font><a href="http://www.tutorialspoint.com/c_standard_library/c_function_fopen.htm"><font color="#008000">'_C_IFS_fopen'</font></a><font color="#800080">);</font>
 <a name="line21"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//File name</font>
 <a name="line22"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//File mode</font>
 <a name="line23"></a><font color="#ff0000">end-pr</font><font color="#800080">;</font>
 <a name="line24"></a>
-<a name="line25"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> ReadFile </font><font color="#800000">pointer</font> <font color="#800000">extproc</font><font color="#800080">(</font><font color="#008000">'_C_IFS_fgets'</font><font color="#800080">);</font>
+<a name="line25"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> ReadFile </font><font color="#800000">pointer</font> <font color="#800000">extproc</font><font color="#800080">(</font><a href="https://www.tutorialspoint.com/c_standard_library/c_function_fgets.htm"><font color="#008000">'_C_IFS_fgets'</font></a><font color="#800080">);</font>
 <a name="line26"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Retrieved data</font>
 <a name="line27"></a><font color="#000000">  *n </font><font color="#800000">int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Data size</font>
 <a name="line28"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Misc pointer</font>
 <a name="line29"></a><font color="#ff0000">end-pr</font><font color="#800080">;</font>
 <a name="line30"></a>
-<a name="line31"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> WriteFile </font><font color="#800000">pointer</font> <font color="#800000">extproc</font><font color="#800080">(</font><font color="#008000">'_C_IFS_fwrite'</font><font color="#800080">);</font>
+<a name="line31"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> WriteFile </font><font color="#800000">pointer</font> <font color="#800000">extproc</font><font color="#800080">(</font><a href="https://www.tutorialspoint.com/c_standard_library/c_function_fwrite.htm"><font color="#008000">'_C_IFS_fwrite'</font></a><font color="#800080">);</font>
 <a name="line32"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Write data</font>
 <a name="line33"></a><font color="#000000">  *n </font><font color="#800000">int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Data size</font>
 <a name="line34"></a><font color="#000000">  *n </font><font color="#800000">int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Block size</font>
 <a name="line35"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Misc pointer</font>
 <a name="line36"></a><font color="#ff0000">end-pr</font><font color="#800080">;</font>
 <a name="line37"></a>
-<a name="line38"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> CloseFile </font><font color="#800000">extproc</font><font color="#800080">(</font><font color="#008000">'_C_IFS_fclose'</font><font color="#800080">);</font>
+<a name="line38"></a><font color="#ff0000">dcl-pr</font><font color="#000000"> CloseFile </font><font color="#800000">extproc</font><font color="#800080">(</font><a href="https://www.tutorialspoint.com/c_standard_library/c_function_fclose.htm"><font color="#008000">'_C_IFS_fclose'</font></a><font color="#800080">);</font>
 <a name="line39"></a><font color="#000000">  *n </font><font color="#800000">pointer</font> <font color="#800000">value</font><font color="#800080">;</font>  <font color="#008080">//Misc pointer</font>
 <a name="line40"></a><font color="#ff0000">end-pr</font><font color="#800080">;</font>
 </pre>
@@ -68,3 +68,67 @@
 <a name="line251"></a><font color="#800080">EndIf;</font>
 </pre>
 
+<p>So it would only get past this point if the file has been opened correctly, which is what we want. Next, we can loop through our file and read the contents of it - using a do while! Nice and simple. So while <code>ReadFile</code> returns a pointer, it also passes in the lines value into one of the parameters by reference since we're passing it a pointer and length (<code>gBuildFile.RtvData</code>)</p>
+
+<pre>
+<a name="line247"></a><font color="#800080">Dow</font>  <font color="#800080">(</font><font color="#000000">ReadFile</font><font color="#800080">(</font><font color="#0000ff">%addr</font><font color="#800080">(</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData</font><font color="#800080">)</font>
+<a name="line248"></a>              <font color="#800080">:</font><font color="#0000ff">%Len</font><font color="#800080">(</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData</font><font color="#800080">)</font>
+<a name="line249"></a>              <font color="#800080">:</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">FilePtr</font><font color="#800080">)</font> <font color="#800080">&lt;&gt;</font> <font color="#808000">*null</font><font color="#800080">);</font>
+
+<a name="line351"></a><font color="#000000">  gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData </font><font color="#800080">=</font> <font color="#008000">' '</font><font color="#800080">;</font>
+<a name="line352"></a><font color="#800080">Enddo;</font>
+</pre>
+
+<p>Before the end of the do-loop, it is vital we assign blank to <code>gBuildFile.RtvData</code>. If you don't characters will stick around in there when you read the next line. Since files can also contain weird things like line breaks, end of records, tabs, etc, we are going to need to remove those so we don't have anything icky in our program! After the beginning of the do-loop, you'll want these <code><font color="#0000ff">%xlate</font></code>s to replace those weird bytes.</p>
+
+<p><b>That's it</b>. You can now read the clean data from your stream file in the IFS! The code might look something like this:</p>
+
+<pre>
+<a name="line247"></a><font color="#800080">Dow</font>  <font color="#800080">(</font><font color="#000000">ReadFile</font><font color="#800080">(</font><font color="#0000ff">%addr</font><font color="#800080">(</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData</font><font color="#800080">)</font>
+<a name="line248"></a>              <font color="#800080">:</font><font color="#0000ff">%Len</font><font color="#800080">(</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData</font><font color="#800080">)</font>
+<a name="line249"></a>              <font color="#800080">:</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">FilePtr</font><font color="#800080">)</font> <font color="#800080">&lt;&gt;</font> <font color="#808000">*null</font><font color="#800080">);</font>
+<a name="line256"></a><font color="#000000">  gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData </font><font color="#800080">=</font> <font color="#0000ff">%xlate</font><font color="#800080">(</font><font color="#008000">x'00'</font><font color="#800080">:</font><font color="#008000">' '</font><font color="#800080">:</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData</font><font color="#800080">);</font><font color="#008080">//End of record null</font>
+<a name="line257"></a><font color="#000000">  gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData </font><font color="#800080">=</font> <font color="#0000ff">%xlate</font><font color="#800080">(</font><font color="#008000">x'25'</font><font color="#800080">:</font><font color="#008000">' '</font><font color="#800080">:</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData</font><font color="#800080">);</font><font color="#008080">//Line feed (LF)</font>
+<a name="line258"></a><font color="#000000">  gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData </font><font color="#800080">=</font> <font color="#0000ff">%xlate</font><font color="#800080">(</font><font color="#008000">x'0D'</font><font color="#800080">:</font><font color="#008000">' '</font><font color="#800080">:</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData</font><font color="#800080">);</font><font color="#008080">//Carriage return (CR)</font>
+<a name="line259"></a><font color="#000000">  gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData </font><font color="#800080">=</font> <font color="#0000ff">%xlate</font><font color="#800080">(</font><font color="#008000">x'05'</font><font color="#800080">:</font><font color="#008000">' '</font><font color="#800080">:</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData</font><font color="#800080">);</font><font color="#008080">//Tab</font>
+
+<a name="line263"></a>  <font color="#800080">If</font> <font color="#800080">(</font><font color="#000000">gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData </font><font color="#800080">=</font> <font color="#008000">'Hello!!'</font><font color="#800080">);</font>
+<a name="line264"></a>    <font color="#ff0000">DSPLY</font> <font color="#008000">'Line in file says hi!'</font><font color="#800080">;</font>
+<a name="line265"></a>  <font color="#800080">ENDIF;</font>
+
+<a name="line351"></a><font color="#000000">  gBuildFile</font><font color="#800080">.</font><font color="#000000">RtvData </font><font color="#800080">=</font> <font color="#008000">' '</font><font color="#800080">;</font>
+<a name="line352"></a><font color="#800080">Enddo;</font>
+</pre>
+
+<h3>Writing a file</h3>
+<p>Writing a file has the same concept as reading a file. You open, write and close. Like before, I am going to use my <code>File_Temp</code> data-structure template to store my data in. I am also going to use <code>ab</code> as my open mode so API will create or overwrite the file if it already exists.</p>
+
+<pre>
+<a name="line52"></a><font color="#ff0000">Dcl-Ds</font><font color="#000000"> gStreamFile </font><font color="#800000">LikeDS</font><font color="#800080">(</font><font color="#000000">File_Temp</font><font color="#800080">);</font>
+
+<a name="line450"></a><font color="#000000">gStreamFile</font><font color="#800080">.</font><font color="#000000">PathFile </font><font color="#800080">=</font> <font color="#008000">'helloworld.txt'</font><font color="#800080">;</font>
+<a name="line451"></a><font color="#000000">gStreamFile</font><font color="#800080">.</font><font color="#000000">OpenMode </font><font color="#800080">=</font> <font color="#008000">'ab'</font> <font color="#800080">+</font> <font color="#008000">x'00'</font><font color="#800080">;</font>
+<a name="line452"></a><font color="#000000">gStreamFile</font><font color="#800080">.</font><font color="#000000">FilePtr  </font><font color="#800080">=</font><font color="#000000"> OpenFile</font><font color="#800080">(</font><font color="#0000ff">%addr</font><font color="#800080">(</font><font color="#000000">gStreamFile</font><font color="#800080">.</font><font color="#000000">PathFile</font><font color="#800080">)</font>
+<a name="line453"></a>                               <font color="#800080">:</font><font color="#0000ff">%addr</font><font color="#800080">(</font><font color="#000000">gStreamFile</font><font color="#800080">.</font><font color="#000000">OpenMode</font><font color="#800080">));</font>
+</pre>
+
+<p>Next is writing to that file, easy! Don't forget you must manually append line breaks (<code>x'25'</code>) if you want those in your stream file.</p>
+
+<pre>
+<a name="line161"></a><font color="#ff0000">Dcl-S</font><font color="#000000"> pValue </font><font color="#800000">Char</font><font color="#800080">(</font><font color="#0000ff">100</font><font color="#800080">);</font>
+<a name="line162"></a>
+<a name="line163"></a><font color="#000000">pValue </font><font color="#800080">=</font> <font color="#008000">'Hello world!'</font> <font color="#800080">+</font> <font color="#008000">x'25'</font><font color="#800080">;</font>
+
+<a name="line166"></a><font color="#000000">WriteFile</font><font color="#800080">(</font><font color="#0000ff">%Addr</font><font color="#800080">(</font><font color="#000000">pValue</font><font color="#800080">)</font>
+<a name="line167"></a>         <font color="#800080">:</font><font color="#0000ff">%Len</font><font color="#800080">(</font><font color="#0000ff">%TrimR</font><font color="#800080">(</font><font color="#000000">pValue</font><font color="#800080">))</font>
+<a name="line168"></a>         <font color="#800080">:</font><font color="#0000ff">1</font>
+<a name="line169"></a>         <font color="#800080">:</font><font color="#000000">gStreamFile</font><font color="#800080">.</font><font color="#000000">FilePtr</font><font color="#800080">);</font>
+</pre>
+
+<p>So you can write as many times as you want, but do not forget to close the file!</p>
+
+<pre>
+<a name="line464"></a><font color="#000000">CloseFile</font><font color="#800080">(</font><font color="#000000">gStreamFile</font><font color="#800080">.</font><font color="#000000">FilePtr</font><font color="#800080">);</font>
+</pre>
+
+<p>And that's how you write to a file! Nice and simple, all within free-format RPG.</p>
