@@ -42,7 +42,7 @@
     <div class="main-title">
     </div>
     <div class="main-content">
-      <p>Welcome to the Works Of Barry blog. Here you can find updates and latest blogs by Liam.</p>
+      <p>Welcome to the Works Of Barry blog. Here you can find updates and latest blogs.</p>
       <p>
         <div class="blogs"></div>
       </p>
@@ -51,10 +51,15 @@
   
   </body>
   <script>
-  const NEW = '<font color="RED">newest</font>';
+  
+  const NEW  = '<font color="RED">newest</font>';
+  var newest = true;
+  
   var blogList = '<ul>';
   for (var i = 0; i < blogs.length; i++) {
-    blogList += '<li><a onclick="loadBlog(blogs[' + i + '].name, blogs[' + i + '].file, blogs[' + i + '].id)" id="blog' + i + '">' + blogs[i].name + '</a> ' + (i == 0 ? NEW : '') + '</li>';
+    if (blogs[i].hide !== undefined) continue;
+    blogList += '<li><a onclick="loadBlog(blogs[' + i + '].name, blogs[' + i + '].file, blogs[' + i + '].id)" id="blog' + i + '">' + blogs[i].name + '</a> ' + (newest ? NEW : '') + '</li>';
+    newest = false;
   }
   blogList += '</ul>';
   $('div.blogs').html( blogList );
