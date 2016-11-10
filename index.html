@@ -3,7 +3,7 @@
   <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   <script type="text/javascript" src="blogs.json"></script>
   
-  <script>
+  <script>  
   function loadBlog(name, file, id) {
     //NAUGHTY HARD CODED LINK!!
     var title = '<h2><a href="https://worksofbarry.github.io/blog/?' + id + '">' + name + '</a></h2>';
@@ -49,9 +49,10 @@
       </p>
     </div>
 
-  
+    <a href="#" class="back-to-top">Back to Top</a>
   </body>
   <script>
+  
   
   const NEW  = '<font color="RED">newest</font>';
   var newest = true;
@@ -73,5 +74,23 @@
       }
     }
   }
+  </script>
+  <script>
+    $('body').prepend('<a href="#" class="back-to-top">Back to Top</a>');
+  var amountScrolled = 300;
+
+  $(window).scroll(function() {
+    if ( $(window).scrollTop() > amountScrolled ) {
+      $('a.back-to-top').fadeIn('slow');
+    } else {
+      $('a.back-to-top').fadeOut('slow');
+    }
+  });
+  $('a.back-to-top').click(function() {
+    $('html, body').animate({
+      scrollTop: 0
+    }, 700);
+    return false;
+  });
   </script>
 </html>
