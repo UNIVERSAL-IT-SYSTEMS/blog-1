@@ -1,5 +1,11 @@
 var blogs = [
   {
+    "id":"12",
+    "name":"About",
+    "file":"About.html",
+    "hide": true
+  },
+  {
     "id":"11",
     "name":"Brainfuck in RPG",
     "file":"Brainfuck in RPG.html"

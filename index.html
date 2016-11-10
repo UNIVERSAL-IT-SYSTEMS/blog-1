@@ -36,6 +36,7 @@
       <h1 class="project-name">Works Of Barry</h1>
       <h2 class="project-tagline">Open-source RPG, Node.js, PHP, on IBM i</h2>
       <a href="https://worksofbarry.github.io/blog/" class="btn">Home</a>
+      <a href="#" onclick="loadBlog('About', 'About.html', 12)" class="btn">About</a>
       <a href="https://github.com/WorksOfBarry/" class="btn">GitHub</a>
     </section>
 
@@ -58,7 +59,7 @@
   var blogList = '<ul>';
   for (var i = 0; i < blogs.length; i++) {
     if (blogs[i].hide !== undefined) continue;
-    blogList += '<li><a onclick="loadBlog(blogs[' + i + '].name, blogs[' + i + '].file, blogs[' + i + '].id)" id="blog' + i + '">' + blogs[i].name + '</a> ' + (newest ? NEW : '') + '</li>';
+    blogList += '<li><a href="#" onclick="loadBlog(blogs[' + i + '].name, blogs[' + i + '].file, blogs[' + i + '].id)" id="blog' + i + '">' + blogs[i].name + '</a> ' + (newest ? NEW : '') + '</li>';
     newest = false;
   }
   blogList += '</ul>';
