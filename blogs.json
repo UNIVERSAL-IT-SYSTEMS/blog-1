@@ -1,8 +1,14 @@
 var blogs = [
   {
+    "id":"14",
+    "name":"Projects",
+    "file":"Projects.html",
+    "hide": true
+  },
+  {
     "id":"13",
     "name":"RPGLE - Base64 encoding and decoding (including UTF-8)",
-    "file":"RPGLE - Base64 encoding and decoding.html",
+    "file":"RPGLE - Base64 encoding and decoding.html"
   },
   {
     "id":"12",
