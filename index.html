@@ -6,13 +6,11 @@
   <script>  
   function loadBlog(name, file, id) {
     //NAUGHTY HARD CODED LINK!!
-    var link = 'https://worksofbarry.github.io/blog/?' + id;
-    var title = '<h2><a href="' + link + '">' + name + '</a></h2>';
+    var title = '<h2><a href="https://worksofbarry.github.io/blog/?' + id + '">' + name + '</a></h2>';
     $.ajax({
       url : "blogs/" + file,
       dataType: "html",
       success: function (data) {
-        window.location.href = link;
         $(".main-title").hide().html(title).fadeIn('slow');
         $(".main-content").hide().html(data).fadeIn('fast');
       },
