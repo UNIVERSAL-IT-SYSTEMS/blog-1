@@ -1,5 +1,10 @@
 var blogs = [
   {
+    "id":"15",
+    "name":"ILE - Bringing iSeriesPython to Relic",
+    "file":"ILE - Bringing iSeriesPython to Relic.html"
+  },
+  {
     "id":"14",
     "name":"Projects",
     "file":"Projects.html",
