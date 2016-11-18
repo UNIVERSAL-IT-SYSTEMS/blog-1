@@ -262,3 +262,8 @@ a.back-to-top {
 	-moz-border-radius: 30px;
 	border-radius: 30px;
 }
+
+img { 
+   border:3px solid #021a40;
+   width: 100%;
+}
