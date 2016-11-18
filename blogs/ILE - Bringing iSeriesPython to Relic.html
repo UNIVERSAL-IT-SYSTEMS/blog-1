@@ -1,6 +1,6 @@
 <p>Introducing new stuff to Relic is something that is important to me. I want it to support new and old open-source and free software - so I decided to give iSeriesPython a build file so we can install it with Relic.</p>
 
-<p><img src="http://i.imgur.com/XIqQd0g.png" width="100%"></p>
+<p><img src="http://i.imgur.com/XIqQd0g.png"></p>
 
 <p>If you’re unfamiliar with iSeriesPython, it’s basically Python 2.7 that runs in the ILE environment – how cool is that! Someone actually ported a language that would normally run in the PASE environment and put it into ILE.. although that happened years ago so I am way behind. The last fix looked to be in 2003, when I was around 6/7.</p>
 
@@ -8,10 +8,10 @@
 <p>So, within the ISeriesPython source there is a build script called <code>create.py</code> – it was a Python script that basically ran all the commands to create all the objects. Great! So I had all the commands I needed inside this Python code. I had to make changes to the script. I removed any call to the <code>sndpgmmsg</code> method and replace any <code>system</code> call with a simple <code>print</code>.</p>
 
 <p>
-<img src="http://i.imgur.com/6WOn8cd.png" width="100%">
-<img src="http://i.imgur.com/yUeqB6c.png" width="100%">
+<img src="http://i.imgur.com/6WOn8cd.png">
+<img src="http://i.imgur.com/yUeqB6c.png">
 
-You are able to <a href=”https://github.com/RelicPackages/iSeriesPython/blob/master/create.py”>find my changes to the script here</a>.
+You are able to <a href="https://github.com/RelicPackages/iSeriesPython/blob/master/create.py">find my changes to the script here</a>.
 </p>
 
 <p>Next, with all these commands, I had to create a build file suitable for Relic. All I really had to do was copy the commands into the build file and also add some extra commands to create the <code>PYTHON27</code> library, create some environment variables, etc. This took a lot of trial and error. I had to spend a lot of time fixing the <code>CHGENVVAR</code> command so it would set the correct values as this was the main cause of the compile failures.</p>
