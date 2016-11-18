@@ -1,5 +1,7 @@
 <p>Introducing new stuff to Relic is something that is important to me. I want it to support new and old open-source and free software - so I decided to give iSeriesPython a build file so we can install it with Relic.</p>
 
+<p><b>Please see the update at the bottom. iSeriesPython now installs with one command sucessfully.</b></p>
+
 <p><img src="http://i.imgur.com/XIqQd0g.png"></p>
 
 <p>If you’re unfamiliar with iSeriesPython, it’s basically Python 2.7 that runs in the ILE environment – how cool is that! Someone actually ported a language that would normally run in the PASE environment and put it into ILE.. although that happened years ago so I am way behind. The last fix looked to be in 2003, when I was around 6/7.</p>
@@ -18,13 +20,12 @@ You are able to <a href="https://github.com/RelicPackages/iSeriesPython/blob/mas
 
 <p>The build file actually sets up the environment variables and also moves the files into the required <code>/python27</code> directory in the root for you.</p>
 
-<p> To install iSeriesPython with Relic, simply use
+<p> <b>To install iSeriesPython with Relic</b>, simply use
 <pre>
 RELICGET PLOC('https://github.com/RelicPackages/iSeriesPython/archive/master.zip') PDIR('iSeriesPython-master') PNAME(PYTHON27) PFETCH(*FETCH)
 </pre></p>
 
 <h3>Almost there</h3>
-
 <p>That was it really. In total, we are down to 14 errors, which is nothing really because after you have done a build you can <code>call python parm(‘script.py’)</code> and Python will invoke correctly. The only real issue left is that it cannot find the <code>os</code> module.. which I will get around to fixing.
 <br>
 <pre>
@@ -38,9 +39,19 @@ Press ENTER to end terminal session.
 </pre>
 </p>
 
-<p>This was really an insight to what Relic is good at as well as a bit of fun setting up and learning about Python 2.7. I recorded some part of this on video, and you can watch below.</p>
+<p>This was really an insight to what Relic is good at as well as a bit of fun setting up and learning about Python 2.7. I recorded some part of this on video, and you can <a href="https://www.youtube.com/watch?v=HxVh1WLXAxM">watch it here</a>.</p>
 
-<iframe width="100%" src="https://www.youtube.com/embed/HxVh1WLXAxM" frameborder="0" allowfullscreen></iframe>
+<h3>Update - it works!</h3>
+<p>Good news, the build is now working thanks to Brian Garland. I posted in the IBMiOSS Ryver group chat asking if anyone could help with the iSeriesPython installation and Brian stepped up. I asked if he could compare the repository's <code>/lib</code> folder with his <code>/lib</code> folder and what did you know, the repo is missing loads of file. I politely asked him if he could ZIP/RAR them to me so I can pop them in the repo. Now it works!</p>
+
+<p><code>hi.py</code>
+<pre>
+print "This line will be printed."
+</pre></p>
+
+<p>From here, I was simply able to <code>CALL PYTHON PARM('hi.py')</code> and the program ran sucessfully! I was very happy.</p>
+
+<p><img src="https://pbs.twimg.com/media/CxkrSgQUAAA8VN1.jpg:large"></p>
 
 <h3>Links</h3>
 <p>
