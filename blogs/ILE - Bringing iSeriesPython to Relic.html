@@ -25,7 +25,20 @@ RELICGET PLOC('https://github.com/RelicPackages/iSeriesPython/archive/master.zip
 
 <h3>Almost there</h3>
 
-<p>That was it really. In total, we are down to 14 errors, which is nothing really because after you have done a build you can <code>call python parm(‘script.py’)</code> and Python will invoke correctly. The only real issue left is that it cannot find the <code>os</code> module.. which I will get around to fixing. This was really an insight to what Relic is good at as well as a bit of fun setting up and learning about Python 2.7. I recorded some part of this on video, and you can watch below.</p>
+<p>That was it really. In total, we are down to 14 errors, which is nothing really because after you have done a build you can <code>call python parm(‘script.py’)</code> and Python will invoke correctly. The only real issue left is that it cannot find the <code>os</code> module.. which I will get around to fixing.
+<br>
+<pre>
+> CALL PYTHON PARM('hi.py')
+
+Traceback (most recent call last):                  
+  File "/python27/lib/site.py", line 62, in <module>
+    import os                                       
+ImportError: No module named os                     
+Press ENTER to end terminal session.                
+</pre>
+</p>
+
+<p>This was really an insight to what Relic is good at as well as a bit of fun setting up and learning about Python 2.7. I recorded some part of this on video, and you can watch below.</p>
 
 <iframe width="100%" src="https://www.youtube.com/embed/HxVh1WLXAxM" frameborder="0" allowfullscreen></iframe>
 
