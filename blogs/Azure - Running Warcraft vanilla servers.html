@@ -1,0 +1,35 @@
+<p>Before I start the post, I need to mention that I do this to learn – not to host public World of Warcraft vanilla servers. I have no intention of wanting a legal battle with Blizzard. I write this post to show my learning steps of using Azure and Windows Server. I will not be sharing links to the server emulator I found or the 1.12.1 client I will be using to test.</p>
+
+<p>Now the legal is out the way, I tried out Azure to host a vanilla World of Warcraft servers. I played a lot of Warcraft between 2012 and 2015 and have always been interested in how these servers are hosted. There have been a lot of vanilla servers that have been shut down by Blizzard, but I am not intending in hosting a public server.</p>
+
+<h3>Running the server locally</h3>
+
+<p>This is the fun part. Running your server locally and connecting to your own private Warcraft – such a thrill! But what if you want friends to join (for a LAN party, say?). The one thing I would do is run the emulator on a dedicated machine on the name network. Boom! All your friends can play with you locally.</p>
+
+<p>So, what if you wanted to continue playing after the party over the internet – you’d have to port forward and expose your IP+open ports. Most home IPs are not static and is likely to change which can be annoying. </p>
+
+<p>The ports I forwarded are:
+<ul>
+  <li>3724 for login server – I chose to do both TCP & UDP</li>
+  <li>8085 for world server – Again, I chose both TCP & UDP</li>
+</ul>
+Honestly, I think you can ignore the UDP as I think (cannot confirm) that the emulator just uses TCP.</p>
+
+<p>Open those ports, change the <code>realmlist.wtf</code> file to point to your external IP address and launch the game client to sign in with the default account provided.
+<pre>
+set realmlist 123.456.789.12
+</pre></p>
+
+<h3>Moving to Azure</h3>
+
+<p>I have never used Azure before, so I was able to sign up for a 30 day free trial and get 120 Pound for free in credit. This is more than enough to create a single VM instance. I created a Windows Server 2012 R2 server. I named the instance <code>wowvm</code>.</p>
+<p><img src="http://i.imgur.com/rEm8cqX.png"></p>
+
+<p>Next, I would suggest doing the port forwarding – to do this all you have to do is create Endpoints within the virtual machine. Once again, I create the same ports as before:</p>
+<p><img src="http://i.imgur.com/V96JDID.png"></p>
+
+<p>Now is the awkward – or at least it was for me – getting the server files onto the VM instance. You should only really continue if you can get the server running on your local machine and can connect to it from your Warcraft client. Really, you just need to get the emulator folder onto the VM. I put my folder into a RAR file, then uploaded to Dropbox and then downloaded onto the VM from the Dropbox website. This is a picture of me running the server on my VM instance – notice how the Realm name is ‘Barold’.</p>
+<p><img src="http://i.imgur.com/oGdz8uv.png"></p>
+
+<p>And this is me, signed in to the login server and selecting my character – notice the realm name.</p>
+<p><img src="http://i.imgur.com/8Lc5H5S.png"></p>
