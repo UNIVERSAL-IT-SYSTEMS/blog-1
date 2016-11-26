@@ -1,4 +1,4 @@
-<p>Before I start the post, I need to mention that I do this to learn – not to host public World of Warcraft vanilla servers. I have no intention of wanting a legal battle with Blizzard. I write this post to show my learning steps of using Azure and Windows Server. I will not be sharing links to the server emulator I found or the 1.12.1 client I will be using to test.</p>
+<p>Before I start the post, I need to mention that I do this to learn – not to host public World of Warcraft vanilla servers. I have no intention of wanting a legal battle with Blizzard. I write this post to show my learning steps of using Azure and Windows Server. I will not be sharing links to the the 1.12.1 client I will be using to test, but you can find the <a href="https://www.getmangos.eu/">server emulator (MaNGOS) here.</a></p>
 
 <p>Now the legal is out the way, I tried out Azure to host a vanilla World of Warcraft servers. I played a lot of Warcraft between 2012 and 2015 and have always been interested in how these servers are hosted. There have been a lot of vanilla servers that have been shut down by Blizzard, but I am not intending in hosting a public server.</p>
 
@@ -28,8 +28,34 @@ set realmlist 123.456.789.12
 <p>Next, I would suggest doing the port forwarding – to do this all you have to do is create Endpoints within the virtual machine. Once again, I create the same ports as before:</p>
 <p><img src="http://i.imgur.com/V96JDID.png"></p>
 
-<p>Now is the awkward – or at least it was for me – getting the server files onto the VM instance. You should only really continue if you can get the server running on your local machine and can connect to it from your Warcraft client. Really, you just need to get the emulator folder onto the VM. I put my folder into a RAR file, then uploaded to Dropbox and then downloaded onto the VM from the Dropbox website. This is a picture of me running the server on my VM instance – notice how the Realm name is ‘Barold’.</p>
-<p><img src="http://i.imgur.com/oGdz8uv.png"></p>
+<p>Now is the awkward – or at least it was for me – getting the server files onto the VM instance. You should only really continue if you can get the server running on your local machine and can connect to it from your Warcraft client. Really, you just need to get the emulator folder onto the VM. I put my folder into a RAR file, then uploaded to Dropbox and then downloaded onto the VM from the Dropbox website.</p>
+
+<p>We need to set it up so our login server will point to the correct place our world server is hosted - luckily for us it's the same VM instance and therefore the same external IP address as the login server. The realm list is stored in a table called <code>realmlist</code> within the <code>realmd</code> database - which is inside the MySQL instance we have running. Now you will need to decide on what you'd like your realm to be called (mine is Barold) and you will also need to find the DNS name from your VM instance. I prefer to use the DNS name as the IP will change every time you start up your VM.</p>
+
+<p><img src="http://i.imgur.com/M25OqfC.png"></p>
+
+<p>To update the world server IP address and Realm name, you will need to turn the server off but keep the MySQL instance running. Now you will need to run a MySQL client, but I just use the command line. You can also find the default MySQL login details within the <code>realmd.conf</code> file. I will be using the default username and password for this example.</p>
+
+<p>
+<pre>
+mysql -u root -pascent realmd
+
+mysql> select * from realmlist;
++----+--------+-----------+------+------+------------+----------+----------------------+------------+-------------+
+| id | name   | address   | port | icon | realmflags | timezone | allowedSecurityLevel | population | realmbuilds |
++----+--------+-----------+------+------+------------+----------+----------------------+------------+-------------+
+|  1 | MaNGOS | 127.0.0.1 | 8085 |    4 |          0 |        1 |                    0 |          0 | 5875 6005   |
++----+--------+-----------+------+------+------------+----------+----------------------+------------+-------------+
+1 row in set (0.00 sec)
+
+mysql> update realmlist set name='<font color=red>Barold</font>', address='<font color=red>wowvm1234.cloudapp.net</font>' where id=1;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+</pre>
+</p>
+
+<p>This is a picture of me now running the server on my VM instance – notice how the Realm name is ‘Barold’.</p>
+<p><img src="http://i.imgur.com/yasJW3c.png"></p>
 
 <p>And this is me, signed in to the login server and selecting my character – notice the realm name.</p>
 <p><img src="http://i.imgur.com/8Lc5H5S.png"></p>
