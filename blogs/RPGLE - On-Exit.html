@@ -38,7 +38,7 @@ ON-EXIT [indicator];
 <a name="line21"></a>
 <a name="line22"></a>  <font color="#800080">Return</font><font color="#000000"> Result</font><font color="#800080">;</font>
 <a name="line23"></a><font color="#ff0000">On-Exit</font><font color="#800080">;</font>
-<a name="line24"></a>  <font color="#ff0000">Dsply</font> <font color="#800080">(</font><font color="#008000">'doDivide failed'</font><font color="#800080">);</font>
+<a name="line24"></a>  <font color="#ff0000">Dsply</font> <font color="#800080">(</font><font color="#008000">'doDivide on-exit'</font><font color="#800080">);</font>
 <a name="line25"></a>  <font color="#800080">Return</font> <font color="#0000ff">0</font><font color="#800080">;</font>
 <a name="line26"></a><font color="#800080">END-PROC;</font>
 </pre>
@@ -49,7 +49,8 @@ ON-EXIT [indicator];
 <pre>
 DSPLY Mainline start
 DSPLY doDivide success
-DSPLY doDivide failed
+DSPLY doDivide on-exit
+DSPLY doDivide on-exit
 DSPLY Mainline end
 </pre>
 </p>
