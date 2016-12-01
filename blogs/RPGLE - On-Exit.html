@@ -1,0 +1,74 @@
+<p>I haven’t seen many blogs about RPG’s new <code>on-exit</code> operation yet – so here’s a go at it. Imagine On-Exit to be a block of code that will always run when the procedure ends – even if the procedure crashes.</p>
+
+<p><blockquote cite="http://www-01.ibm.com/support/docview.wss?uid=nas2SE65914">
+The ILE RPG compiler is enhanced to support a new ON-EXIT operation code which begins a section of code to be run every time the procedure ends, either normally or abnormally.   
+</blockquote></p>
+
+<h3>Syntax</h3>
+<p>The on-exit operation has a very basic syntax. It’s the op-code followed by an optional extender factor 2 which can contain an indicator name. The operation will set the value of the factor 2 indicator to <code>*ON</code> if the procedure ended abnormally, otherwise <code>*OFF</code>.
+<pre>
+ON-EXIT;
+ON-EXIT [indicator];
+</pre></p>
+
+<h3>Example</h3>
+
+<p>
+<h4>Snippet</h4>
+<pre>
+<a name="line1"></a><font color="#008000">**FREE</font>
+<a name="line2"></a><font color="#ff0000">Ctl-Opt</font> <font color="#800000">DftActGrp</font><font color="#800080">(</font><font color="#808000">*no</font><font color="#800080">);</font>
+<a name="line3"></a>
+<a name="line4"></a><font color="#ff0000">dsply</font> <font color="#800080">(</font><font color="#008000">'Mainline start'</font><font color="#800080">);</font>
+<a name="line5"></a><font color="#000000">doDivide</font><font color="#800080">(</font><font color="#0000ff">2</font><font color="#800080">:</font><font color="#0000ff">1</font><font color="#800080">);</font>
+<a name="line6"></a><font color="#000000">doDivide</font><font color="#800080">(</font><font color="#0000ff">2</font><font color="#800080">:</font><font color="#0000ff">0</font><font color="#800080">);</font>
+<a name="line7"></a><font color="#ff0000">dsply</font> <font color="#800080">(</font><font color="#008000">'Mainline end'</font><font color="#800080">);</font>
+<a name="line8"></a>
+<a name="line9"></a><font color="#000000">*InLR </font><font color="#800080">=</font> <font color="#808000">*On</font><font color="#800080">;</font>
+<a name="line10"></a><font color="#800080">Return;</font>
+<a name="line11"></a>
+<a name="line12"></a><font color="#800080">Dcl-Proc</font><font color="#000000"> doDivide</font><font color="#800080">;</font>
+<a name="line13"></a>  <font color="#ff0000">Dcl-Pi</font><font color="#000000"> *N </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">3</font><font color="#800080">);</font>
+<a name="line14"></a><font color="#000000">    ValA </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">3</font><font color="#800080">)</font> <font color="#800000">Const</font><font color="#800080">;</font>
+<a name="line15"></a><font color="#000000">    ValB </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">3</font><font color="#800080">)</font> <font color="#800000">Const</font><font color="#800080">;</font>
+<a name="line16"></a>  <font color="#ff0000">END-PI</font><font color="#800080">;</font>
+<a name="line17"></a>  <font color="#ff0000">Dcl-S</font><font color="#000000"> Result </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">3</font><font color="#800080">);</font>
+<a name="line18"></a>
+<a name="line19"></a>  <font color="#ff0000">Dsply</font> <font color="#800080">(</font><font color="#008000">'doDivide'</font><font color="#800080">);</font>
+<a name="line20"></a><font color="#000000">  Result </font><font color="#800080">=</font><font color="#000000"> (ValA / ValB);</font>
+<a name="line21"></a>
+<a name="line22"></a>  <font color="#800080">Return</font><font color="#000000"> Result</font><font color="#800080">;</font>
+<a name="line23"></a><font color="#ff0000">On-Exit</font><font color="#800080">;</font>
+<a name="line24"></a>  <font color="#ff0000">Dsply</font> <font color="#800080">(</font><font color="#008000">'doDivide failed'</font><font color="#800080">);</font>
+<a name="line25"></a>  <font color="#800080">Return</font> <font color="#0000ff">0</font><font color="#800080">;</font>
+<a name="line26"></a><font color="#800080">END-PROC;</font>
+</pre>
+</p>
+
+<p>
+<h4>Output</h4>
+<pre>
+DSPLY Mainline start
+DSPLY doDivide
+DSPLY doDivide failed
+DSPLY Mainline end
+</pre>
+</p>
+
+<h3>PTFs</h3>
+<p>This is available for both 7.2 and 7.3 by the look of the <a href="http://ibm.biz/RPG_ON_EXIT_Section">IBM developerWorks site</a> - where you can also read a lot more about On-Exit;
+
+<h5>7.2</h5>
+<ul>
+  <li>SI62949: RPG runtime</li>
+  <li>SI62955: TGTRLS(*CURRENT) compiler</li>
+  <li><b>Or</b>, get DB2 PTF group SF99702 Level 14. These PTFs are part of that group PTF.</li>
+</ul>
+
+<h5>7.3</h5>
+<ul>
+  <li>SI62950: RPG runtime</li>
+  <li>SI62957: TGTRLS(*CURRENT) compiler</li>
+  <li>SI62965: TGTRLS(*PRV) compiler</li>
+  <li><b>Or</b>, get DB2 PTF group SF99703 Level 3. These PTFs are part of that group PTF.</li>
+</ul>

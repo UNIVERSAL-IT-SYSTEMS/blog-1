@@ -1,5 +1,10 @@
 var blogs = [
   {
+    "id":"17",
+    "name":"RPGLE - On-Exit",
+    "file":"RPGLE - On-Exit.html"
+  },
+  {
     "id":"16",
     "name":"Azure - Running Warcraft vanilla servers",
     "file":"Azure - Running Warcraft vanilla servers.html"
