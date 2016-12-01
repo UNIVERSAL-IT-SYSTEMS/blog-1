@@ -47,10 +47,17 @@ ON-EXIT [indicator];
 <p>
 <h4>Output</h4>
 <pre>
+//Program start
 DSPLY Mainline start
+
+//doDivide(2:1) success and will still process on-exit
 DSPLY doDivide success
 DSPLY doDivide on-exit
+
+//doDivide(2:0) fails and will still process the on-exit block
 DSPLY doDivide on-exit
+
+//Program end
 DSPLY Mainline end
 </pre>
 </p>
