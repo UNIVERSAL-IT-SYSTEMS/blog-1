@@ -1,7 +1,7 @@
 <p>I haven’t seen many blogs about RPG’s new <code>on-exit</code> operation yet – so here’s a go at it. Imagine On-Exit to be a block of code that will always run when the procedure ends – even if the procedure crashes.</p>
 
 <p><blockquote cite="http://www-01.ibm.com/support/docview.wss?uid=nas2SE65914">
-The ILE RPG compiler is enhanced to support a new ON-EXIT operation code which begins a section of code to be run every time the procedure ends, either normally or abnormally.   
+The ILE RPG compiler is enhanced to support a new ON-EXIT operation code which begins a section of code to be run every time the procedure ends, either normally or abnormally. If the procedure does end abnormally, it will still end the program after the on-exit block has processed.
 </blockquote></p>
 
 <h3>Syntax</h3>
@@ -47,18 +47,19 @@ ON-EXIT [indicator];
 <p>
 <h4>Output</h4>
 <pre>
-//Program start
-DSPLY Mainline start
+//Start
+DSPLY  Mainline start
 
-//doDivide(2:1) success and will still process on-exit
-DSPLY doDivide success
-DSPLY doDivide on-exit
+//First doDivide
+DSPLY  doDivide success
+DSPLY  doDivide on-exit
 
-//doDivide(2:0) fails and will still process the on-exit block
-DSPLY doDivide on-exit
+//Second doDivide
+The call to DODIVIDE ended in error (C G D F).     
+C
+DSPLY  doDivide on-exit
 
-//Program end
-DSPLY Mainline end
+//After on-exit, program end
 </pre>
 </p>
 
