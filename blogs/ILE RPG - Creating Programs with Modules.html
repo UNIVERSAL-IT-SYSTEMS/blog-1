@@ -2,7 +2,7 @@
 
 <p>A program object on IBM i is made up of modules. When you use <code>CRTBNDRPG</code>, this just wraps <code>CRTRPGMOD</code> and <code>CRTPGM</code> together. In this guide, I will show you how to have multiple modules in a single program and how they can interact with each other. You can also use <code>CRTSQLRPGI</code> to create modules - which is what we'll be doing for our math module as it will use Embedded SQL.</p>
 
-<p>When you use <code>CRTPGM</code>, you have to specify an entry module. This is a single module that will have a mainline, all the other modules will use the NoMain header and all the procedures will use the <code>EXPORT</code> keyword so we are able to prototype them in other modules.</p>
+<p>When you use <code>CRTPGM</code>, you have to specify an entry module. This is a single module that will have a mainline, all the other modules will use the <code>NoMain</code> header and all the procedures will use the <code>EXPORT</code> keyword so we are able to prototype them in other modules.</p>
 
 <p>First, let's create a module that will act as a math module:</p>
 
