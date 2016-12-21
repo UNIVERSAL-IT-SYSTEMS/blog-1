@@ -1,5 +1,10 @@
 var blogs = [
   {
+    "id":"18",
+    "name":"ILE RPG - Creating Programs with Modules",
+    "file":"ILE RPG - Creating Programs with Modules.html"
+  },
+  {
     "id":"17",
     "name":"RPGLE - On-Exit",
     "file":"RPGLE - On-Exit.html"

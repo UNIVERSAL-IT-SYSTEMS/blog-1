@@ -1,0 +1,80 @@
+<p>Modular programs are the best. One of my favourite skills is knowing how to create modules to create modular programs.</p>
+
+<p>A program object on IBM i is made up of modules. When you use <code>CRTBNDRPG</code>, this just wraps <code>CRTRPGMOD</code> and <code>CRTPGM</code> together. In this guide, I will show you how to have multiple modules in a single program and how they can interact with each other. You can also use <code>CRTSQLRPGI</code> to create modules - which is what we'll be doing for our math module as it will use Embedded SQL.</p>
+
+<p>When you use <code>CRTPGM</code>, you have to specify an entry module. This is a single module that will have a mainline, all the other modules will use the NoMain header and all the procedures will use the <code>EXPORT</code> keyword so we are able to prototype them in other modules.</p>
+
+<p>First, let's create a module that will act as a math module:</p>
+
+<p>
+<pre>
+<a name="line1"></a><font color="#008000">**FREE</font>
+<a name="line2"></a>
+<a name="line3"></a><font color="#ff0000">Ctl-Opt</font> <font color="#800000">NoMain</font><font color="#800080">;</font>
+<a name="line4"></a>
+<a name="line5"></a><font color="#800080">Dcl-Proc</font><font color="#000000"> Math_Pow </font><font color="#800000">Export</font><font color="#800080">;</font>
+<a name="line6"></a>  <font color="#ff0000">Dcl-Pi</font><font color="#000000"> *N </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">);</font>
+<a name="line7"></a><font color="#000000">    pNumA </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">const</font><font color="#800080">;</font>
+<a name="line8"></a><font color="#000000">    pNumB </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">const</font><font color="#800080">;</font>
+<a name="line9"></a>  <font color="#ff0000">End-pi</font><font color="#800080">;</font>
+<a name="line10"></a>
+<a name="line11"></a>  <font color="#ff0000">Dcl-S</font><font color="#000000"> lResult </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">);</font>
+<a name="line12"></a>  <font color="#000080">EXEC</font> <font color="#000080">SQL</font> <font color="#0000ff">SET</font><font color="#000000"> :lResult = </font><font color="#804000">POWER</font><font color="#000000">(:pNumA, :pNumB);</font>
+<a name="line13"></a>  <font color="#800080">Return</font><font color="#000000"> lResult</font><font color="#800080">;</font>
+<a name="line14"></a><font color="#800080">End-Proc;</font>
+<a name="line15"></a>
+<a name="line16"></a><font color="#800080">Dcl-proc</font><font color="#000000"> Math_Cos </font><font color="#800000">Export</font><font color="#800080">;</font>
+<a name="line17"></a>  <font color="#ff0000">Dcl-pi</font><font color="#000000"> *N </font><font color="#800000">Packed</font><font color="#800080">(</font><font color="#0000ff">11</font><font color="#800080">:</font><font color="#0000ff">8</font><font color="#800080">);</font>
+<a name="line18"></a><font color="#000000">    pNum </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">Const</font><font color="#800080">;</font>
+<a name="line19"></a>  <font color="#ff0000">End-pi</font><font color="#800080">;</font>
+<a name="line20"></a>
+<a name="line21"></a>  <font color="#ff0000">Dcl-S</font><font color="#000000"> lResult </font><font color="#800000">Packed</font><font color="#800080">(</font><font color="#0000ff">11</font><font color="#800080">:</font><font color="#0000ff">8</font><font color="#800080">);</font>
+<a name="line22"></a>  <font color="#000080">EXEC</font> <font color="#000080">SQL</font> <font color="#0000ff">SET</font><font color="#000000"> :lResult = </font><font color="#804000">COS</font><font color="#000000">(:pNum);</font>
+<a name="line23"></a>  <font color="#800080">Return</font><font color="#000000"> lResult</font><font color="#800080">;</font>
+<a name="line24"></a><font color="#800080">End-proc;</font>
+</pre>
+</p>
+
+<p>To compile this, use <code>CRTSQLRPGI</code> with <code>OBJTYPE(*MODULE)</code> - this will create us a module to use later. I called this program MATHMOD.</p>
+
+<p>Next we can create our entry module, which is where all your program code will go. To access our math modules procedures, we will need to declare the procedure prototypes with EXTPROC for each procedure. You can optionally put those into another member/stream file and <code>/COPY</code> them in.</p>
+
+<p>
+<pre>
+<a name="line1"></a><font color="#008000">**FREE</font>
+<a name="line4"></a>
+<a name="line5"></a><font color="#ff0000">Dcl-pr</font><font color="#000000"> Math_Pow </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">ExtProc</font><font color="#800080">(</font><font color="#008000">'MATH_POW'</font><font color="#800080">);</font>
+<a name="line6"></a><font color="#000000">  pNumA </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">const</font><font color="#800080">;</font>
+<a name="line7"></a><font color="#000000">  pNumB </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">const</font><font color="#800080">;</font>
+<a name="line8"></a><font color="#ff0000">End-pr</font><font color="#800080">;</font>
+<a name="line9"></a>
+<a name="line10"></a><font color="#ff0000">Dcl-pr</font><font color="#000000"> Math_Cos </font><font color="#800000">Packed</font><font color="#800080">(</font><font color="#0000ff">11</font><font color="#800080">:</font><font color="#0000ff">8</font><font color="#800080">)</font> <font color="#800000">ExtProc</font><font color="#800080">(</font><font color="#008000">'MATH_COS'</font><font color="#800080">);</font>
+<a name="line11"></a><font color="#000000">  pNum </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">)</font> <font color="#800000">Const</font><font color="#800080">;</font>
+<a name="line12"></a><font color="#ff0000">End-Pr</font><font color="#800080">;</font>
+<a name="line13"></a>
+<a name="line14"></a><font color="#ff0000">Dcl-s</font><font color="#000000"> MyPow </font><font color="#800000">Int</font><font color="#800080">(</font><font color="#0000ff">10</font><font color="#800080">);</font>
+<a name="line15"></a><font color="#ff0000">Dcl-s</font><font color="#000000"> MyCos </font><font color="#800000">Packed</font><font color="#800080">(</font><font color="#0000ff">11</font><font color="#800080">:</font><font color="#0000ff">8</font><font color="#800080">);</font>
+<a name="line16"></a>
+<a name="line17"></a><font color="#000000">MyPow </font><font color="#800080">=</font><font color="#000000"> math_pow</font><font color="#800080">(</font><font color="#0000ff">5</font><font color="#800080">:</font><font color="#0000ff">6</font><font color="#800080">);</font>
+<a name="line18"></a><font color="#000000">MyCos </font><font color="#800080">=</font><font color="#000000"> math_cos</font><font color="#800080">(</font><font color="#0000ff">12</font><font color="#800080">);</font>
+<a name="line19"></a>
+<a name="line20"></a><font color="#000000">*InLR </font><font color="#800080">=</font> <font color="#808000">*on</font><font color="#800080">;</font>
+<a name="line21"></a><font color="#800080">Return;</font>
+</pre>
+</p>
+
+<p>To compile this, we can simply use <code>CRTRPGMOD</code> since there is no Embedded SQL. I called this program MYPGM.</p>
+
+<p>Now that we have both modules, we can use <code>CRTPGM</code>. Notice how the first module on my list is the entry module, you are also able to manually specify the entry module. I am going to call the program MYPGM.</p>
+
+<pre>
+> CRTPGM PGM(MYLIB/MYPGM) MODULE(MYLIB/MYPGM MYLIB/MATHMOD)
+
+Program MYPGM created in library MYLIB.
+</pre>
+
+<p>Now the program has been created! We can call it how we'd normally call a program, and also debug how we'd normally debug a program.</p>
+
+<p><img src="http://i.imgur.com/znTmj3N.png\"></p>
+
+<p>You should get the idea of how to add more modules. Create another module, write the headers for it on other modules to access it and include it in the module list on <code>CRTPGM</code>.</p>
