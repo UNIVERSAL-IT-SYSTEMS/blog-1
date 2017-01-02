@@ -1,0 +1,69 @@
+<p>I have been working on a project to help people learn what coding for an AS/400 would have been like. I have been working on an implementation of RPG2, with some RPG3 features.</p>
+
+<p>It's written in C# and all RPG programs are interpreted. Not every RPG feature has been implemented yet. As this isn't open-source yet, I am still making all the design choices myself. <b>The sole purpose of this project is to help people learn</b>. No one wants to write fixed format RPG anymore, but this is just to preserve some history.</p>
+
+<p>Features include:
+<ul>
+  <li>Variables (Integer, Packed, Indicator, Character, Varying, Arrays)</li>
+  <li>Data areas (Either from variables or data-structures, as external text files)</li>
+  <li>Pointers (allowing for overlays and Pointer (*) type)</li>
+  <li>Data structures</li>
+  <li>Record level access (with KEY fields, no DDS yet)</li>
+  <li>Subroutines</li>
+</ul>
+</p>
+
+<h2>Record Level Access</h2>
+<p>This part was annoying, but fun to implement! To get Record-Level-Access to work correct, I had to implement data-structures so I could correctly format the record formats.</p> 
+
+<p>There is no DDS imeplementation (yet). A 'physical file' consists of two pieces of data - the data-structure definition and the records in the file.</p>
+
+<pre>
+     D CUSFILE         DS           
+     D  username                     15a   KEY
+     D  realname                     25a
+     D  age                           2p  
+!!**
+WorksOfBarry   Liam Allan                 19
+AnotherUser    Jon Doe                    99
+millymai15     Emily-Mai Brown            19
+</pre>
+
+<p>This indicates that the CUSFILE data will be based in the <code>CUSFILE</code> data-structure and that the file key is based on the username. All the data after <code>!!**</code> indicates that it is the data within the file.</p>
+
+<pre>
+     F CUSFILE
+     
+     C      *loval       SETLL     CUSFILE
+     
+     C      *in90        DOWEQ     *Off
+     C                   READ      CUSFILE                                90
+     C      username     DSPLY
+     C                   ENDDO
+     C      'end'        dsply
+</pre>
+
+<p>Not all physical file features are implemented. Simply, this defines a file, sets the lower limit to the beginning of the file, then loops through each record and prints the <code>USERNAME</code> field.</p>
+
+<p><img src="http://i.imgur.com/1uWjRqz.png"></p>
+
+<h2>Debug Views</h2>
+<p>There are also 3 debugging views:
+<ol>
+  <li>1. Source code view (runtime code mapped to source code)</li>
+  <li>2. Runtime code view (Some operations are transformed at runtime)</li>
+  <li>3. Variable listing</li>
+</ol>
+
+<h3>Source code view</h3>
+<img src="http://i.imgur.com/4tAcizT.png">
+
+<h3>Runtime view</h3>
+<img src="http://i.imgur.com/eBO70Iq.png">
+
+<h3>Runtime view</h3>
+<img src="http://i.imgur.com/tzRj18B.png">
+</p>
+
+<h2>When to release</h2>
+<p>This is a lot of fun for me to work on. When I feel like I've added most of the opcodes, I will work on release. Of course, it'll be free and open-source - just got to choose the right time.</p>
