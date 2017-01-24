@@ -1,5 +1,11 @@
 var blogs = [
   {
+    "id":"20",
+    "name":"IBMiCmd Plugin Documentation",
+    "file":"IBMiCmdDocs.html",
+    "hide": true
+  },
+  {
     "id":"19",
     "name":"RPG2 Toy Language",
     "file":"RPG2 Toy Language.html"

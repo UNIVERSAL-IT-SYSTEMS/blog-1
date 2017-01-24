@@ -1,0 +1,91 @@
+<h1>IBMiCmd Plugin Documentation</h1>
+
+<h3>Contents</h3>
+<p>
+<ol>
+  <li>First time run</li> 
+  <li>Command Entry</li> 
+  <li>Error Listing</li> 
+  <li>Command Bindings</li> 
+</ol>
+</p>
+
+<h2>First time run</h2>
+
+<p>When you first run Notepad++ with IBMiCMd, you will be prompted that a new config has been created for the plugin.</p>
+
+<img src="http://i.imgur.com/I71JwA4.png">
+
+<p>The config will be created where all config is stored for Notepad++, this will usually be in your <code>%appdata%</code>. For example: <code>C:\Users\youruser\AppData\Roaming\Notepad++\plugins\ConfigIBMiCmd.cfg</code>. You can open this file up with any text editor.</p>
+
+<p>Open the config and specifiy which system to use, as well as a username and password for that system. Save a close the file and restart Notepad++.</p>
+
+<h2>Command Entry</h2>
+
+<p>To open the Command Entry window:
+<ol>
+  <li>Select Plugins</li> 
+  <li>Select IBMiCmd</li> 
+  <li>Select IBM i Command Entry</li>
+</ol>
+
+There are two sections to this window. The textbox where you can enter commands and the command log. 
+
+Each set of commands you submit will have it's own job. To have multiple commands run on the same job, seperate commands by line. It's important to note that each job will have a starting current directory of <code>/QSYS.lib</code> and you can use <code>CD [dir]</code> to change it. You should also submit a <code>CHGLIBL</code> command to specify a library list if required.
+</p>
+
+<p>For example, if you wanted to compile code in your home directory you might submit
+<pre>
+CD '/home/USER'
+CRTBNDRPG PGM(MYLIB/mypgm) SRCSTMF('mypgm.rpgle') OPTION(*EVENTF)
+</pre>
+</p>
+
+<p>When entering commands, use Enter to go to the next line. To submit entered commands, use Ctrl+Enter.</p>
+
+<img src="http://i.imgur.com/PPsF18m.png">
+
+<h2>Error Listing</h2>
+
+<p>To open the Error Listing window:
+<ol>
+  <li>Select Plugins</li> 
+  <li>Select IBMiCmd</li> 
+  <li>Select IBM i Error Listing</li>
+</ol>
+</p>
+
+<p>The Error Listing window is used to display error from a program compile (RPG, C/C++, COBOL). To do this, we have to double click on the "Double click to change object" item, which will load a popup.</p>
+
+<p>In this window, we must specify the name of the program/module we tried to create and what library we tried to create it in; then press Select.</p>
+
+<img src="http://i.imgur.com/rcTsIRl.png">
+
+<p>That should cause some loading to occur and then for the Error Listing to be populated. You will be notified if there are no errors. You are able to double click on the errors to be taken to the line of the error. (<b>Note</b>: this functionality is buggy with SQL programs.)</p>
+
+<p>You can double click the "Double click to change object" to load different errors for another program.</p>
+
+<h2>Command Bindings</h2>
+
+<p>To open the Command Entry window:
+<ol>
+  <li>Select Plugins</li> 
+  <li>Select IBMiCmd</li> 
+  <li>Select IBM i Command Bindings</li>
+</ol>
+</p>
+
+<p>Command bindings are used to automate command entry and error listing. For example, a binding can do multiple takes in one binding; like change the directory, then compile a program and then load the errors for that program automatically. You will automatically have two bindings which you can use as an example.</p>
+
+<p>To add a binding, press "Add bind". To edit a binding, select the binding from the list and then press "Edit bind". To delete a binding, select the bind and then use the delete key.</p>
+
+<p>Double clicking on a binding will run the commands on the connected system and print the results on the Command Entry window.</p>
+
+<p>Binding provides a special command, called <code>ERRORS</code>. This allows you to automatically display the errors of a program/module, instead of you having to select the program/module from the Error Listing screen. <code>ERRORS</code> has two parameters: the first is the library and the second is the program/module name. For example, in this script it will change the current directory, create a program and then load the errors for the program:
+<pre>
+CD '/home/LALLAN'
+CRTBNDRPG PGM(#LALLAN/BUILD) SRCSTMF('RelicPackageManager/QSOURCE/BUILD.SQLRPGLE') OPTION(*EVENTF) REPLACE(*YES)
+ERRORS #LALLAN BUILD
+</pre></p>
+
+<img src="http://i.imgur.com/Gk2z0OF.png">
