@@ -12,13 +12,13 @@
 
 <h2>First time run</h2>
 
-<p>When you first run Notepad++ with IBMiCMd, you will be prompted that a new config has been created for the plugin.</p>
+<p>When you first run Notepad++ with IBMiCmd, you will be prompted that a new config has been created for the plugin.</p>
 
 <img src="http://i.imgur.com/I71JwA4.png">
 
 <p>The config will be created where all config is stored for Notepad++, this will usually be in your <code>%appdata%</code>. For example: <code>C:\Users\youruser\AppData\Roaming\Notepad++\plugins\ConfigIBMiCmd.cfg</code>. You can open this file up with any text editor.</p>
 
-<p>Open the config and specifiy which system to use, as well as a username and password for that system. Save a close the file and restart Notepad++.</p>
+<p>Open the config and specifiy which system to use, as well as a username and password for that system. Save, close the file and restart Notepad++.</p>
 
 <h2>Command Entry</h2>
 
@@ -29,9 +29,9 @@
   <li>Select IBM i Command Entry</li>
 </ol>
 
-There are two sections to this window. The textbox where you can enter commands and the command log. 
+There are two sections to this window. The textbox where you can enter commands and the command log section. 
 
-Each set of commands you submit will have it's own job. To have multiple commands run on the same job, seperate commands by line. It's important to note that each job will have a starting current directory of <code>/QSYS.lib</code> and you can use <code>CD [dir]</code> to change it. You should also submit a <code>CHGLIBL</code> command to specify a library list if required.
+Each set of commands you submit will have it's own job. To have multiple commands run on the same job, seperate each command a by line. It's important to note that each job will have a starting current directory of <code>/QSYS.lib</code> and you can use <code>CD [dir]</code> to change it. You should also submit a <code>CHGLIBL</code> command to specify a library list if required.
 </p>
 
 <p>For example, if you wanted to compile code in your home directory you might submit
