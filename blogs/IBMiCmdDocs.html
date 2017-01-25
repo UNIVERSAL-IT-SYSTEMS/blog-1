@@ -16,9 +16,17 @@
 
 <img src="http://i.imgur.com/I71JwA4.png">
 
-<p>The config will be created where all config is stored for Notepad++, this will usually be in your <code>%appdata%</code>. For example: <code>C:\Users\youruser\AppData\Roaming\Notepad++\plugins\ConfigIBMiCmd.cfg</code>. You can open this file up with any text editor.</p>
+<p>The config will be created where all configs are stored for Notepad++, this will usually be in your %appdata% folder. For example: <code>C:\Users\youruser\AppData\Roaming\Notepad++\plugins\ConfigIBMiCmd.cfg</code>. You can open this file up with any text editor.</p>
 
-<p>Open the config and specifiy which system to use, as well as a username and password for that system. Save, close the file and restart Notepad++.</p>
+<p>Open the config and specify which IBM i system to use, as well as a username and password for that system.</p>
+
+<pre>
+system=MYSYSTEM
+username=MYUSER
+password=MYPASS
+</pre>
+
+<p>Save, close the file and restart Notepad++.</p>
 
 <h2>Command Entry</h2>
 
@@ -31,7 +39,7 @@
 
 There are two sections to this window. The textbox where you can enter commands and the command log section. 
 
-Each set of commands you submit will have it's own job. To have multiple commands run on the same job, seperate each command a by line. It's important to note that each job will have a starting current directory of <code>/QSYS.lib</code> and you can use <code>CD [dir]</code> to change it. You should also submit a <code>CHGLIBL</code> command to specify a library list if required.
+Each set of commands you submit will have it's own job. To have multiple commands run on the same job, separate each command a by line. It's important to note that each job will have a starting current directory of <code>/QSYS.lib</code> and you can use <code>CD [dir]</code> to change it. You should also submit a <code>CHGLIBL</code> command to specify a library list if required.
 </p>
 
 <p>For example, if you wanted to compile code in your home directory you might submit
@@ -55,13 +63,13 @@ CRTBNDRPG PGM(MYLIB/mypgm) SRCSTMF('mypgm.rpgle') OPTION(*EVENTF)
 </ol>
 </p>
 
-<p>The Error Listing window is used to display error from a program compile (RPG, C/C++, COBOL). To do this, we have to double click on the "Double click to change object" item, which will load a popup.</p>
+<p>The Error Listing window is used to display error from a program compile (RPG, C/C++, COBOL). To do this, double click on the "Double click to change object" item, which will load a popup.</p>
 
-<p>In this window, we must specify the name of the program/module we tried to create and what library we tried to create it in; then press Select.</p>
+<p>In this window, specify the name of the program/module you tried to create and what library you tried to create it in; then press Select.</p>
 
 <img src="http://i.imgur.com/rcTsIRl.png">
 
-<p>That should cause some loading to occur and then for the Error Listing to be populated. You will be notified if there are no errors. You are able to double click on the errors to be taken to the line of the error. (<b>Note</b>: this functionality is buggy with SQL programs.)</p>
+<p>That should cause some loading to occur and then the Error Listing to be populated. You will be notified if there are no errors. Double click on an error to be taken to the line of the error. (<b>Note</b>: this functionality is buggy with SQL programs.)</p>
 
 <p>You can double click the "Double click to change object" to load different errors for another program.</p>
 
@@ -77,7 +85,7 @@ CRTBNDRPG PGM(MYLIB/mypgm) SRCSTMF('mypgm.rpgle') OPTION(*EVENTF)
 
 <p>Command bindings are used to automate command entry and error listing. For example, a binding can do multiple takes in one binding; like change the directory, then compile a program and then load the errors for that program automatically. You will automatically have two bindings which you can use as an example.</p>
 
-<p>To add a binding, press "Add bind". To edit a binding, select the binding from the list and then press "Edit bind". To delete a binding, select the bind and then use the delete key.</p>
+<p>To add a binding, click "Add bind". To edit a binding, select the binding from the list and then click "Edit bind". To delete a binding, select the bind and then use the delete key.</p>
 
 <p>Double clicking on a binding will run the commands on the connected system and print the results on the Command Entry window.</p>
 
