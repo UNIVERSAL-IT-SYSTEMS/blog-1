@@ -1,14 +1,21 @@
-<h1>IBMiCmd Plugin Documentation</h1>
-
 <h3>Contents</h3>
 <p>
 <ol>
+  <li>Installation</li> 
   <li>First time run</li> 
   <li>Command Entry</li> 
   <li>Error Listing</li> 
   <li>Command Bindings</li> 
 </ol>
 </p>
+
+<h2>Installtion</h2>
+
+<p>IBMiCmds does not provide the ability to edit source members or stream files. To do this you will require NppFTP, which is available in the Plugin Manager within Notepad++.</p>
+
+<p>IBMiCmds does not provide RPG syntax highlighting. This is a separate install <a href="https://github.com/WorksOfBarry/Notepad-RPG">that can be found here</a>.
+
+<p>When you have this plugin installed, you should configure a connection to the system you will develop on and also set the Transfer Mode to 'ASCII'.</p>
 
 <h2>First time run</h2>
 
@@ -37,10 +44,9 @@ password=MYPASS
   <li>Select IBM i Command Entry</li>
 </ol>
 
-There are two sections to this window. The textbox where you can enter commands and the command log section. 
+There are two sections to this window. The textbox where you can enter commands and the command log section.</p>
 
-Each set of commands you submit will have it's own job. To have multiple commands run on the same job, separate each command a by line. It's important to note that each job will have a starting current directory of <code>/QSYS.lib</code> and you can use <code>CD [dir]</code> to change it. You should also submit a <code>CHGLIBL</code> command to specify a library list if required.
-</p>
+<p>Each set of commands you submit will have it's own job. To have multiple commands run on the same job, separate each command a by line. It's important to note that each job will have a starting current directory of <code>/QSYS.lib</code> and you can use <code>CD [dir]</code> to change it. You should also submit a <code>CHGLIBL</code> command to specify a library list if required.</p>
 
 <p>For example, if you wanted to compile code in your home directory you might submit
 <pre>
@@ -85,9 +91,12 @@ CRTBNDRPG PGM(MYLIB/mypgm) SRCSTMF('mypgm.rpgle') OPTION(*EVENTF)
 
 <p>Command bindings are used to automate command entry and error listing. For example, a binding can do multiple takes in one binding; like change the directory, then compile a program and then load the errors for that program automatically. You will automatically have two bindings which you can use as an example.</p>
 
-<p>To add a binding, click "Add bind". To edit a binding, select the binding from the list and then click "Edit bind". To delete a binding, select the bind and then use the delete key.</p>
-
-<p>Double clicking on a binding will run the commands on the connected system and print the results on the Command Entry window.</p>
+<p><ol>
+  <li>To add a binding, click "Add bind"</li> 
+  <li>To edit a binding, select the binding from the list and then click "Edit bind"</li> 
+  <li>To delete a binding, select the bind and then use the delete key.</li>
+  <li>Double clicking on a binding will run the commands on the connected system and print the results on the Command Entry window.</li>
+</ol>
 
 <p>Binding provides a special command, called <code>ERRORS</code>. This allows you to automatically display the errors of a program/module, instead of you having to select the program/module from the Error Listing screen. <code>ERRORS</code> has two parameters: the first is the library and the second is the program/module name. For example, in this script it will change the current directory, create a program and then load the errors for the program:
 <pre>
