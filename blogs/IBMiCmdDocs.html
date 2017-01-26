@@ -105,14 +105,14 @@ CRTBNDRPG PGM(#LALLAN/BUILD) SRCSTMF('RelicPackageManager/QSOURCE/BUILD.SQLRPGLE
 ERRORS #LALLAN BUILD
 </pre></p>
 
+<img src="http://i.imgur.com/Gk2z0OF.png">
+
 <p>Binding also provides the ability to use 'variables'. Variables allow you make generic bindings, like a single binding to compile a program. For example:
 <pre>
 CD '/home/MYUSER'
 CRTSQLRPGI OBJ(#MYUSER/%file%) SRCSTMF('%file%.%ext%') OPTION(*EVENTF) REPLACE(*YES) COMMIT(*NONE)
 ERRORS #MYUSER %file%
 </pre></p>
-
-<img src="http://i.imgur.com/Gk2z0OF.png">
 
 <p>Available variables:
 <table>
