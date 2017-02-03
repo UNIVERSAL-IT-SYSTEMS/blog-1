@@ -1,5 +1,10 @@
 var blogs = [
   {
+    "id":"21",
+    "name":"IBM Champion 2017",
+    "file":"IBM Champion.html"
+  },
+  {
     "id":"20",
     "name":"IBMiCmd Plugin Documentation",
     "file":"IBMiCmdDocs.html",
