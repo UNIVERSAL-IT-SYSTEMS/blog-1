@@ -13,7 +13,8 @@ var blogs = [
   {
     "id":"19",
     "name":"RPG2 Toy Language",
-    "file":"RPG2 Toy Language.html"
+    "file":"RPG2 Toy Language.html",
+    "hide": true
   },
   {
     "id":"18",
