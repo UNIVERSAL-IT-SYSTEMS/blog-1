@@ -1,5 +1,11 @@
 var blogs = [
   {
+    "id":"21",
+    "name":"March Update",
+    "file":"MarchUpdate.html",
+    "hide": true
+  },
+  {
     "id":"20",
     "name":"IBMiCmd Plugin Documentation",
     "file":"IBMiCmdDocs.html",
