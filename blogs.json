@@ -1,9 +1,13 @@
 var blogs = [
   {
-    "id":"21",
+    "id":"22",
     "name":"March Update",
-    "file":"MarchUpdate.html",
-    "hide": true
+    "file":"MarchUpdate.html"
+  },
+  {
+    "id":"21",
+    "name":"IBM Champion 2017",
+    "file":"IBM Champion.html"
   },
   {
     "id":"20",
@@ -14,7 +18,8 @@ var blogs = [
   {
     "id":"19",
     "name":"RPG2 Toy Language",
-    "file":"RPG2 Toy Language.html"
+    "file":"RPG2 Toy Language.html",
+    "hide": true
   },
   {
     "id":"18",
